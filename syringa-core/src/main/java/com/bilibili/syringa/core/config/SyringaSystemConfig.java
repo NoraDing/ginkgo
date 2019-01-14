@@ -1,14 +1,13 @@
 /**
- * Bilibili.com Inc.
- * Copyright (c) 2009-2019 All Rights Reserved.
+ * Bilibili.com Inc. Copyright (c) 2009-2019 All Rights Reserved.
  */
-package com.bilibili.syringa.core.dto;
+package com.bilibili.syringa.core.config;
 
 /**
  * @author dingsainan
- * @version $Id: LoaderConfigDTO.java, v 0.1 2019-01-14 上午11:43 dingsainan Exp $$
+ * @version $Id: SyringaSystemConfig.java, v 0.1 2019-01-14 上午11:43 dingsainan Exp $$
  */
-public class LoaderConfigDTO {
+public class SyringaSystemConfig {
 
     private String appId;
     private String appNumber;
@@ -19,9 +18,13 @@ public class LoaderConfigDTO {
     private String packageScale;
     private String appConfig;        //To be determined
 
-    public LoaderConfigDTO(String appId, String appNumber, String reqNumber, String pkgType,
-                           String partitionNumber, String totalMessageCount, String packageScale,
-                           String appConfig) {
+    public SyringaSystemConfig() {
+
+    }
+
+    public SyringaSystemConfig(String appId, String appNumber, String reqNumber, String pkgType,
+                               String partitionNumber, String totalMessageCount,
+                               String packageScale, String appConfig) {
         this.appId = appId;
         this.appNumber = appNumber;
         this.reqNumber = reqNumber;
@@ -98,8 +101,8 @@ public class LoaderConfigDTO {
 
     @Override
     public String toString() {
-        return "LoaderConfigDTO{" + "appId='" + appId + '\'' + ", appNumber='" + appNumber + '\''
-               + ", reqNumber='" + reqNumber + '\'' + ", pkgType='" + pkgType + '\''
+        return "SyringaSystemConfig{" + "appId='" + appId + '\'' + ", appNumber='" + appNumber
+               + '\'' + ", reqNumber='" + reqNumber + '\'' + ", pkgType='" + pkgType + '\''
                + ", partitionNumber='" + partitionNumber + '\'' + ", totalMessageCount='"
                + totalMessageCount + '\'' + ", packageScale='" + packageScale + '\''
                + ", appConfig='" + appConfig + '\'' + '}';

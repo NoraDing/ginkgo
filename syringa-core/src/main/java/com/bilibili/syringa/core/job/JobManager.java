@@ -10,4 +10,5 @@ package com.bilibili.syringa.core.job;
  * @version $Id: JobManager.java, v 0.1 2019-01-14 上午11:23 dingsainan Exp $$
  */
 public class JobManager {
+
 }

@@ -1,23 +1,23 @@
 /**
- * Bilibili.com Inc.
- * Copyright (c) 2009-2019 All Rights Reserved.
+ * Bilibili.com Inc. Copyright (c) 2009-2019 All Rights Reserved.
  */
 package com.bilibili.syringa.core.client;
 
 import java.util.concurrent.LinkedBlockingDeque;
 
-import com.bilibili.syringa.core.dispatcher.AppDispatcher;
-import com.bilibili.syringa.core.dto.LoaderConfigDTO;
+import com.bilibili.syringa.core.SyringaContext;
+import com.bilibili.syringa.core.config.SyringaSystemConfig;
 import com.bilibili.syringa.core.enums.ApplicationEnums;
 import com.bilibili.syringa.core.executor.ConsumerExecutor;
 import com.bilibili.syringa.core.executor.Executor;
 import com.bilibili.syringa.core.executor.ProducerExecutor;
+import com.bilibili.syringa.core.job.JobConfig;
 
 /**
  * @author dingsainan
- * @version $Id: KafkaLoader.java, v 0.1 2019-01-14 上午11:21 dingsainan Exp $$
+ * @version $Id: Syringa.java, v 0.1 2019-01-14 上午11:21 dingsainan Exp $$
  */
-public class KafkaLoader {
+public class Syringa {
 
     public static void main(String[] args) {
 
@@ -35,15 +35,27 @@ public class KafkaLoader {
         String packageScale = args[7]; //sample="10:1M;20:3M;30:512k;40:218K"
         String appConfig = args[8]; //To be determined
 
+        //1.参数解析 args
+
+        SyringaSystemConfig syringaSystemConfig = new SyringaSystemConfig();
+        SyringaContext.getInstance().setSyringaSystemConfig(syringaSystemConfig);
+
+        //2.初始化job 
+        JobConfig jobConfig = new JobConfig();
+
+        //3.作业运行
+
+        //4.收集统计信息
+
         //register and start dispatcher
-        LoaderConfigDTO loaderConfigDTO = new LoaderConfigDTO(appId, appNumber, reqNumber, pkgType,
-            partitionNumber, nMessage, packageScale, appConfig);
-        registerAndStartDispatcher(appType, loaderConfigDTO);
+        //        SyringaSystemConfig syringaSystemConfig = new SyringaSystemConfig(appId, appNumber,
+        //            reqNumber, pkgType, partitionNumber, nMessage, packageScale, appConfig);
+        //        registerAndStartDispatcher(appType, syringaSystemConfig);
 
     }
 
     private static void registerAndStartDispatcher(String appType,
-                                                   LoaderConfigDTO loaderConfigDTO) {
+                                                   SyringaSystemConfig syringaSystemConfig) {
 
         LinkedBlockingDeque<Executor> executors = new LinkedBlockingDeque<>();
 
@@ -56,9 +68,9 @@ public class KafkaLoader {
             executors.add(new ProducerExecutor());
 
         }
-        AppDispatcher appDispatcher = new AppDispatcher(loaderConfigDTO, executors);
+        //        JobDispatcher appDispatcher = new JobDispatcher(syringaSystemConfig, executors);
 
-        appDispatcher.serviceStart();
+        //        appDispatcher.serviceStart();
 
     }
 

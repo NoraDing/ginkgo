@@ -1,6 +1,5 @@
 /**
- * Bilibili.com Inc.
- * Copyright (c) 2009-2019 All Rights Reserved.
+ * Bilibili.com Inc. Copyright (c) 2009-2019 All Rights Reserved.
  */
 package com.bilibili.syringa.core.executor;
 
@@ -13,7 +12,7 @@ public class ConsumerExecutor implements Executor {
 
     //真正的执行过程
     @Override
-    public void execute( ) {
+    public void execute() {
 
     }
 }

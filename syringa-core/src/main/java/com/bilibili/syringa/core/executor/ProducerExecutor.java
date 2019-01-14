@@ -1,56 +1,50 @@
 /**
- * Bilibili.com Inc.
- * Copyright (c) 2009-2019 All Rights Reserved.
+ * Bilibili.com Inc. Copyright (c) 2009-2019 All Rights Reserved.
  */
 package com.bilibili.syringa.core.executor;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.bilibili.syringa.core.config.SyringaSystemConfig;
+import com.bilibili.syringa.core.config.SyringaTopicConfig;
+import com.bilibili.syringa.core.enums.DataSizeEnums;
+import com.bilibili.syringa.core.enums.ScalePercentEnums;
+import com.bilibili.syringa.core.producer.ProducerApp;
+import com.bilibili.syringa.core.tool.CalculateUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import com.bilibili.syringa.core.dto.LoaderConfigDTO;
-import com.bilibili.syringa.core.dto.PackageScaleDTO;
-import com.bilibili.syringa.core.enums.DataSizeEnums;
-import com.bilibili.syringa.core.enums.ScalePercentEnums;
-import com.bilibili.syringa.core.producer.ProducerApp;
-import com.bilibili.syringa.core.tool.CalculateUtils;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
- *
  * @author dingsainan
  * @version $Id: ProducerExecutor.java, v 0.1 2019-01-14 下午12:00 dingsainan Exp $$
  */
-@Component
 public class ProducerExecutor implements Executor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProducerExecutor.class);
-    private LoaderConfigDTO     loaderConfigDTO;
+    private SyringaSystemConfig syringaSystemConfig;
 
-    public void setLoaderConfigDTO(LoaderConfigDTO loaderConfigDTO) {
-        this.loaderConfigDTO = loaderConfigDTO;
+    public void setSyringaSystemConfig(SyringaSystemConfig syringaSystemConfig) {
+        this.syringaSystemConfig = syringaSystemConfig;
     }
 
-    @Autowired
-    private ProducerApp           producerApp;
+    private ProducerApp producerApp;
 
-    private List<PackageScaleDTO> packageScaleDTOS;
+    private List<SyringaTopicConfig> syringaTopicConfigs;
 
     //真正的执行过程
     @Override
     public void execute() {
 
-        int totalMessageCount = Integer.valueOf(loaderConfigDTO.getTotalMessageCount());
-        int appNumber = Integer.valueOf(loaderConfigDTO.getAppNumber());
-        packageScaleDTOS = parsePackageScale(loaderConfigDTO.getPackageScale());
+        int totalMessageCount = Integer.valueOf(syringaSystemConfig.getTotalMessageCount());
+        int appNumber = Integer.valueOf(syringaSystemConfig.getAppNumber());
+        syringaTopicConfigs = parsePackageScale(syringaSystemConfig.getPackageScale());
 
         //根据topic的个数，选择要进行produce的topic
         String topic = selectTopic();
@@ -66,9 +60,9 @@ public class ProducerExecutor implements Executor {
 
     }
 
-    private List<PackageScaleDTO> parsePackageScale(String value) {
+    private List<SyringaTopicConfig> parsePackageScale(String value) {
 
-        List<PackageScaleDTO> packageScaleDTOS = new ArrayList<>();
+        List<SyringaTopicConfig> syringaTopicConfigs = new ArrayList<>();
 
         // sample="1:1;2:1;3:2"
         String[] splits = value.split(";");
@@ -85,11 +79,11 @@ public class ProducerExecutor implements Executor {
             int packageSizeType = Integer.valueOf(kv[1]);
 
 
-            packageScaleDTOS.add(new PackageScaleDTO(scaleType, packageSizeType));
+            syringaTopicConfigs.add(new SyringaTopicConfig(scaleType, packageSizeType));
 
         }
 
-        return packageScaleDTOS;
+        return syringaTopicConfigs;
 
     }
 
@@ -122,7 +116,7 @@ public class ProducerExecutor implements Executor {
 
     private void sendData(int totalMessageCount, String topic) {
         KafkaProducer kafkaProducer = producerApp.createProducer();
-        if (CollectionUtils.isEmpty(packageScaleDTOS)) {
+        if (CollectionUtils.isEmpty(syringaTopicConfigs)) {
             long startDate = System.currentTimeMillis();
             while (totalMessageCount > 0) {
                 byte[] generateSize = generateProducerData(DataSizeEnums.OneM.getValue());
@@ -136,11 +130,11 @@ public class ProducerExecutor implements Executor {
 
         }
 
-        if (CollectionUtils.isNotEmpty(packageScaleDTOS)) {
+        if (CollectionUtils.isNotEmpty(syringaTopicConfigs)) {
             int finalTotalMessageCount = totalMessageCount;
-            packageScaleDTOS.stream().forEach(packageScaleDTO -> {
-                int scaleType = packageScaleDTO.getScaleType();
-                int dataSizeType = packageScaleDTO.getDataSizeType();
+            syringaTopicConfigs.stream().forEach(syringaTopicConfig -> {
+                int scaleType = syringaTopicConfig.getScaleType();
+                int dataSizeType = syringaTopicConfig.getDataSizeType();
                 int scale = ScalePercentEnums.getValueByType(scaleType);
                 int dataSize = DataSizeEnums.getValueByType(dataSizeType);
                 int sharedCount = CalculateUtils.mutiple(finalTotalMessageCount, scale);

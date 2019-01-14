@@ -1,6 +1,5 @@
 /**
- * Bilibili.com Inc.
- * Copyright (c) 2009-2019 All Rights Reserved.
+ * Bilibili.com Inc. Copyright (c) 2009-2019 All Rights Reserved.
  */
 package com.bilibili.syringa.core.enums;
 
@@ -10,9 +9,11 @@ package com.bilibili.syringa.core.enums;
  * @version $Id: ApplicationEnums.java, v 0.1 2019-01-14 下午2:16 dingsainan Exp $$
  */
 public enum ApplicationEnums {
-    PRODUCER(1, "生产者"), CONSUMER(2, "消费者");
+    PRODUCER(1, "生产者"),
 
-    private int    type;
+    CONSUMER(2, "消费者");
+
+    private int type;
     private String field;
 
     ApplicationEnums(int type, String field) {

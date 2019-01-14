@@ -1,20 +1,21 @@
 /**
- * Bilibili.com Inc.
- * Copyright (c) 2009-2019 All Rights Reserved.
+ * Bilibili.com Inc. Copyright (c) 2009-2019 All Rights Reserved.
  */
-package com.bilibili.syringa.core.dto;
+package com.bilibili.syringa.core.config;
+
+import com.bilibili.syringa.core.SyringaConfig;
 
 /**
- *
  * @author dingsainan
- * @version $Id: PackageScaleDTO.java, v 0.1 2019-01-14 下午5:32 dingsainan Exp $$
+ * @version $Id: SyringaTopicConfig.java, v 0.1 2019-01-14 下午5:32 dingsainan Exp $$
  */
-public class PackageScaleDTO {
-    private int scaleType;
-    private int dataSizeType;
-    private int sharedCount;
+public class SyringaTopicConfig implements SyringaConfig {
 
-    public PackageScaleDTO(int scaleType, int dataSizeType) {
+    private int scaleType;   //百分比类型
+    private int dataSizeType; //大小类型
+    private int sharedCount; //
+
+    public SyringaTopicConfig(int scaleType, int dataSizeType) {
         this.scaleType = scaleType;
         this.dataSizeType = dataSizeType;
     }
@@ -45,7 +46,7 @@ public class PackageScaleDTO {
 
     @Override
     public String toString() {
-        return "PackageScaleDTO{" + "scaleType=" + scaleType + ", dataSizeType=" + dataSizeType
+        return "SyringaTopicConfig{" + "scaleType=" + scaleType + ", dataSizeType=" + dataSizeType
                + ", sharedCount=" + sharedCount + '}';
     }
 }
