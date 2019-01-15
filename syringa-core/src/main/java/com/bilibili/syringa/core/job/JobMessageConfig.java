@@ -28,4 +28,9 @@ public class JobMessageConfig {
     public void setSize(long size) {
         this.size = size;
     }
+
+    @Override
+    public String toString() {
+        return "JobMessageConfig{" + "percent=" + percent + ", size=" + size + '}';
+    }
 }

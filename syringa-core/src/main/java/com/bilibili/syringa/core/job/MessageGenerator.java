@@ -5,6 +5,7 @@ package com.bilibili.syringa.core.job;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -26,9 +27,13 @@ public class MessageGenerator {
     private static final Logger           LOGGER = LoggerFactory.getLogger(MessageGenerator.class);
 
     private List<JobMessageConfig>        jobMessageConfigList;
-    private Map<JobMessageConfig, String> messages;
+    private Map<JobMessageConfig, byte[]> messages;
 
-    private AtomicBoolean                 init   = new AtomicBoolean(false);
+    public void setJobMessageConfigList(List<JobMessageConfig> jobMessageConfigList) {
+        this.jobMessageConfigList = jobMessageConfigList;
+    }
+
+    private AtomicBoolean init = new AtomicBoolean(false);
 
     public static MessageGenerator instance() {
         return new MessageGenerator();
@@ -51,9 +56,6 @@ public class MessageGenerator {
         int size = jobMessageConfigList.size();
 
         messages = new HashMap<>(size);
-
-        //
-        getMessage();
     }
 
     /**
@@ -72,15 +74,24 @@ public class MessageGenerator {
         for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
 
             long size = jobMessageConfig.getSize();
-            byte[] data = generateProducerData(size);
-            messages.put(jobMessageConfig, String.valueOf(data));
+            byte[] data = generateData(size);
+            messages.put(jobMessageConfig, data);
+
+        }
+
+        Iterator<Map.Entry<JobMessageConfig, byte[]>> iterator = messages.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<JobMessageConfig, byte[]> next = iterator.next();
+            JobMessageConfig key = next.getKey();
+            byte[] value = next.getValue();
+            LOGGER.info("the key is {} and the value is {}", key.toString(), value.length);
 
         }
 
         return null;
     }
 
-    private byte[] generateProducerData(long dataSize) {
+    private byte[] generateData(long dataSize) {
 
         byte[] bytes = new byte[Math.toIntExact(dataSize)];
         Random random = new Random();
