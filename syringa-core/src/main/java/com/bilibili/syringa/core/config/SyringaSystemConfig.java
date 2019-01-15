@@ -69,4 +69,10 @@ public class SyringaSystemConfig {
         this.topicList = topicList;
     }
 
+    @Override
+    public String toString() {
+        return "SyringaSystemConfig{" + "type=" + type + ", branches=" + branches + ", messages="
+               + messages + ", concurrency=" + concurrency + ", jobMessageConfigList="
+               + jobMessageConfigList + ", topicList=" + topicList + '}';
+    }
 }

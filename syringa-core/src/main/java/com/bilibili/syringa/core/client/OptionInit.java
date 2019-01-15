@@ -3,15 +3,9 @@
  */
 package com.bilibili.syringa.core.client;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.common.util.concurrent.AbstractService;
-
-import com.bilibili.syringa.core.SyringaContext;
-import com.bilibili.syringa.core.config.SyringaSystemConfig;
-import com.bilibili.syringa.core.enums.TypeEnums;
-import com.bilibili.syringa.core.job.JobMessageConfig;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -21,9 +15,14 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import com.bilibili.syringa.core.SyringaContext;
+import com.bilibili.syringa.core.config.SyringaSystemConfig;
+import com.bilibili.syringa.core.enums.TypeEnums;
+import com.bilibili.syringa.core.job.JobMessageConfig;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.util.concurrent.AbstractIdleService;
 
 /**
  * @author xuezhaoming
@@ -191,4 +190,5 @@ public class OptionInit extends AbstractIdleService {
     protected void shutDown() throws Exception {
 
     }
+
 }

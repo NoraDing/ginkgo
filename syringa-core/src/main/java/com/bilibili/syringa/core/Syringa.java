@@ -53,7 +53,7 @@ public class Syringa {
                 TimeUnit.MILLISECONDS.sleep(500);
             }
 
-            serviceManager.stopAsync();
+            serviceManager.stopAsync().awaitStopped();
 
             LOGGER.info("finish ------------");
             System.exit(1);
