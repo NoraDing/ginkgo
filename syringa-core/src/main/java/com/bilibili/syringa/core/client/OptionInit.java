@@ -54,14 +54,12 @@ public class OptionInit extends AbstractIdleService {
 
             cli = parser.parse(options, args);//-type 1 
             String type = cli.getOptionValue("type");//1.生产者 2.消费者
-            String branches = cli.getOptionValue("branches");//批次
             String messages = cli.getOptionValue("message");//每个批次条数
             String concurrency = cli.getOptionValue("concurrency");//并发度
             String size = cli.getOptionValue("size");//请求大小分布  
             String topics = cli.getOptionValue("topics");//请求的主题
 
             Preconditions.checkNotNull(type, "type is null");
-            Preconditions.checkNotNull(branches, "branches is null");
             Preconditions.checkNotNull(messages, "messages is null");
             Preconditions.checkNotNull(concurrency, "concurrency is null");
             Preconditions.checkNotNull(size, "size is null");
@@ -70,19 +68,16 @@ public class OptionInit extends AbstractIdleService {
             //1.请求类型有效性检查  example -type 1 or 2 
             typeCheck(type);
 
-            //2.批次有效性检查 example -branches 10 
-            branchesCheck(branches);
-
-            //3.每个批次条数检查  example -message 1000 
+            //2.每个批次条数检查  example -message 1000 
             messagesCheck(messages);
 
-            //4.并发度检查 example -concurrency 10 
+            //3.并发度检查 example -concurrency 10 
             concurrencyCheck(concurrency);
 
-            //5.请求分布检查 example  -size 10=4k,20=1k   目前只接受k单位的数值，前面是百分比
+            //4.请求分布检查 example  -size 10=4k,20=1k   目前只接受k单位的数值，前面是百分比
             sizeCheck(size);
 
-            //6.topics 检查 example -topics t1,t2,t3
+            //5.topics 检查 example -topics t1,t2,t3
             List<String> topicLists = COMMA_SPLITTER.splitToList(topics);
             Preconditions.checkArgument(CollectionUtils.isNotEmpty(topicLists), "topic is empty");
             syringaSystemConfig.setTopicList(topicLists);
@@ -176,17 +171,6 @@ public class OptionInit extends AbstractIdleService {
         syringaSystemConfig.setMessages(messagesLong);
     }
 
-    private void branchesCheck(String branches) {
-
-        Integer branchesInt = Integer.valueOf(branches);
-        if (branchesInt < 0) {
-            LOGGER.error("invalid branches {}  muster bigger than zero !", branches);
-            System.exit(-1);
-        }
-
-        syringaSystemConfig.setBranches(branchesInt);
-    }
-
     private void typeCheck(String type) {
 
         TypeEnums typeEnums = TypeEnums.isValid(Integer.valueOf(type));
@@ -200,11 +184,11 @@ public class OptionInit extends AbstractIdleService {
     private Options generateOptions() {
         Options options = new Options();
 
-        options.addOption("appType", "appType", true, "type of the application");
-        options.addOption("requestTimes", "requestTimes", true, "times of the request");
-        options.addOption("nMessage", "nMessage", true, "numbers of the sent message");
-        options.addOption("packageScale", "packageScale", true, "SCALE per package");
-        options.addOption("topicNumber", "topicNumber", true, "number of the topic ");
+        options.addOption("t", "type", true, "start type");
+        options.addOption("m", "message", true, "total messages");
+        options.addOption("c", "concurrency", true, "sender concurrency");
+        options.addOption("s", "size", true, "message size");
+        options.addOption("ts", "topics", true, "number of the topic ");
 
         return options;
     }
