@@ -1,7 +1,7 @@
 /**
  * Bilibili.com Inc. Copyright (c) 2009-2019 All Rights Reserved.
  */
-package com.bilibili.syringa.core;
+package com.bilibili.syringa.core.job;
 
 /**
  *
