@@ -60,7 +60,6 @@ public class OptionInit extends AbstractIdleService {
             String topics = cli.getOptionValue("topics");//请求的主题
 
             Preconditions.checkNotNull(type, "type is null");
-            //            Preconditions.checkNotNull(branches, "branches is null");
             Preconditions.checkNotNull(messages, "messages is null");
             Preconditions.checkNotNull(concurrency, "concurrency is null");
             Preconditions.checkNotNull(size, "size is null");

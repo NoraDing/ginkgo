@@ -12,6 +12,8 @@ public class JobMessageConfig {
 
     private double percent;
     private long   size;
+    private int    startScale;
+    private int    endScale;
 
     public double getPercent() {
         return percent;
@@ -29,8 +31,25 @@ public class JobMessageConfig {
         this.size = size;
     }
 
+    public int getStartScale() {
+        return startScale;
+    }
+
+    public void setStartScale(int startScale) {
+        this.startScale = startScale;
+    }
+
+    public int getEndScale() {
+        return endScale;
+    }
+
+    public void setEndScale(int endScale) {
+        this.endScale = endScale;
+    }
+
     @Override
     public String toString() {
-        return "JobMessageConfig{" + "percent=" + percent + ", size=" + size + '}';
+        return "JobMessageConfig{" + "percent=" + percent + ", size=" + size + ", startScale="
+               + startScale + ", endScale=" + endScale + '}';
     }
 }

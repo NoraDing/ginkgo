@@ -3,6 +3,7 @@
  */
 package com.bilibili.syringa.core.job;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -11,11 +12,8 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
 
 /**
  *
@@ -56,33 +54,60 @@ public class MessageGenerator {
         int size = jobMessageConfigList.size();
 
         messages = new HashMap<>(size);
+        calDistribution();
     }
 
     /**
      * 返回构造的消息
      * @return
      */
-    public String getMessage() {
+    public byte[] getMessage() {
 
         if (!init.get()) {
             LOGGER.warn("should init first !");
             return null;
         }
+        int nextRandom = ThreadLocalRandom.current().nextInt(100);
 
-        Preconditions.checkNotNull(CollectionUtils.isEmpty(jobMessageConfigList),
-            "jobMessageConfigList can not be nul");
+        LOGGER.info("the nextRandom is {}", nextRandom);
+
+        byte[] locateValue = locate(nextRandom);
+        return locateValue;
+    }
+
+    private byte[] locate(int nextRandom) {
+
         for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
+            int startScale = jobMessageConfig.getStartScale();
+            int endScale = jobMessageConfig.getEndScale();
+            if (nextRandom >= startScale && nextRandom <= endScale) {
 
-            long size = jobMessageConfig.getSize();
-            byte[] data = generateData(size);
-            messages.put(jobMessageConfig, data);
+                long size = jobMessageConfig.getSize();
+                LOGGER.info("the percent is {} and the size is {}", jobMessageConfig.getPercent(),
+                    jobMessageConfig.getSize());
+                byte[] data = generateData(size);
+                messages.put(jobMessageConfig, data);
+                return data;
+            }
 
         }
-
-        int i = ThreadLocalRandom.current().nextInt(10);
-
-
         return null;
+    }
+
+    private void calDistribution() {
+
+        int basePercent = 1;
+        for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
+
+            double percent = jobMessageConfig.getPercent();
+            int intValue = basePercent + BigDecimal.valueOf(percent).intValue();
+            int end = basePercent + BigDecimal.valueOf(percent).intValue() - 1;
+            jobMessageConfig.setStartScale(basePercent);
+            jobMessageConfig.setEndScale(end);
+            basePercent = intValue;
+        }
+        LOGGER.info("the calculate value  is {}", jobMessageConfigList.toString());
+
     }
 
     private byte[] generateData(long dataSize) {
