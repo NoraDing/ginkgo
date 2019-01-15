@@ -3,6 +3,8 @@
  */
 package com.bilibili.syringa.core.job;
 
+import java.util.List;
+
 /**
  *
  * @author xuezhaoming
@@ -10,15 +12,18 @@ package com.bilibili.syringa.core.job;
  */
 public abstract class AbstractJob implements Job {
 
-    protected String  name;
+    protected String       name;
 
-    protected long    messageCounter;
+    protected long         messageCounter;
 
-    protected boolean isRunning;
+    protected List<String> topicList;
 
-    public AbstractJob(String name, long messageCounter) {
+    protected boolean      isRunning;
+
+    public AbstractJob(String name, long messageCounter, List<String> topicList) {
         this.name = name;
         this.messageCounter = messageCounter;
+        this.topicList = topicList;
     }
 
     @Override

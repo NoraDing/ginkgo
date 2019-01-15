@@ -5,6 +5,7 @@ package com.bilibili.syringa.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.client.OptionInit;
 import com.bilibili.syringa.core.job.JobManager;
+import com.bilibili.syringa.core.statistics.ResultManager;
+import com.bilibili.syringa.core.statistics.RunResult;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Service;
@@ -41,19 +44,17 @@ public class Syringa {
             //2.启动作业管理
             JobManager jobManager = new JobManager(syringaContext.getSyringaSystemConfig());
 
-            jobManager.startAsync();
-
-            List<Service> serviceList = new ArrayList<>(2);
-            serviceList.add(optionInit);
-            serviceList.add(jobManager);
-
-            ServiceManager serviceManager = new ServiceManager(serviceList);
+            jobManager.startAsync().awaitRunning();
+            List<Future<RunResult>> run = jobManager.run();
 
             while (!syringaContext.isFinish()) {
                 TimeUnit.MILLISECONDS.sleep(500);
             }
 
-            serviceManager.stopAsync().awaitStopped();
+            //            ResultManager resultManager = new ResultManager();
+
+            optionInit.stopAsync().awaitRunning();
+            jobManager.stopAsync().awaitRunning();
 
             LOGGER.info("finish ------------");
             System.exit(1);
@@ -63,5 +64,4 @@ public class Syringa {
         }
 
     }
-
 }

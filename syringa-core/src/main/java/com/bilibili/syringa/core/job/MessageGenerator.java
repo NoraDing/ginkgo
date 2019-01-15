@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -77,6 +78,9 @@ public class MessageGenerator {
             messages.put(jobMessageConfig, data);
 
         }
+
+        int i = ThreadLocalRandom.current().nextInt(10);
+
 
         return null;
     }

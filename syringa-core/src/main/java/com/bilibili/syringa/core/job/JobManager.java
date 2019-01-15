@@ -50,7 +50,6 @@ public class JobManager extends AbstractIdleService {
         LOGGER.info("start to init job manager ");
 
         //转配成作业的配置
-        int branches = syringaSystemConfig.getBranches();
         long messages = syringaSystemConfig.getMessages();
         int concurrency = syringaSystemConfig.getConcurrency();
         long threadMessage = new BigDecimal(messages).divide(new BigDecimal(concurrency))
@@ -58,24 +57,23 @@ public class JobManager extends AbstractIdleService {
 
         Collection<ListenableFuture> listenableFutureList = new ArrayList<>();
 
-        for (int i = 0; i < branches; i++) {
-
-            for (int j = 0; j < concurrency; j++) {
-                Job job = null;
-                switch (syringaSystemConfig.getType()) {
-                    case CONSUMER:
-                        job = new ConsumerJob("consumer-job-" + i, threadMessage);
-                        break;
-                    case PRODUCER:
-                        job = new ProduceJob("producer-job-" + i, threadMessage);
-                        System.out.println();
-                    default:
-
-                }
-                LOGGER.info("submit runjob ");
-                runJob.add(job);
+        for (int j = 0; j < concurrency; j++) {
+            Job job = null;
+            switch (syringaSystemConfig.getType()) {
+                case CONSUMER:
+                    job = new ConsumerJob("consumer-job-" + j, threadMessage,
+                        syringaSystemConfig.getTopicList());
+                    break;
+                case PRODUCER:
+                    job = new ProduceJob("producer-job-" + j, threadMessage,
+                        syringaSystemConfig.getTopicList());
+                    break;
+                default:
 
             }
+            LOGGER.info("submit runjob ");
+            runJob.add(job);
+
         }
 
         //运行作业
