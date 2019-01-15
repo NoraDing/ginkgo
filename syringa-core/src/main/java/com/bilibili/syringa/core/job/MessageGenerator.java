@@ -5,7 +5,6 @@ package com.bilibili.syringa.core.job;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -76,15 +75,6 @@ public class MessageGenerator {
             long size = jobMessageConfig.getSize();
             byte[] data = generateData(size);
             messages.put(jobMessageConfig, data);
-
-        }
-
-        Iterator<Map.Entry<JobMessageConfig, byte[]>> iterator = messages.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<JobMessageConfig, byte[]> next = iterator.next();
-            JobMessageConfig key = next.getKey();
-            byte[] value = next.getValue();
-            LOGGER.info("the key is {} and the value is {}", key.toString(), value.length);
 
         }
 
