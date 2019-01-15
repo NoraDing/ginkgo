@@ -34,19 +34,13 @@ public class Syringa {
 
             //1.启动参数解析
             OptionInit optionInit = new OptionInit(args);
-            optionInit.startAsync();
+            optionInit.startAsync().awaitRunning();
 
             syringaContext.setOptionInit(optionInit);
 
             //2.启动作业管理
             JobManager jobManager = new JobManager(syringaContext.getSyringaSystemConfig());
-            while (!optionInit.isRunning()) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(100);
-                } catch (InterruptedException e) {
-                    //ignore
-                }
-            }
+
             jobManager.startAsync();
 
             List<Service> serviceList = new ArrayList<>(2);
