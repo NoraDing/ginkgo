@@ -3,16 +3,18 @@
  */
 package com.bilibili.syringa.core.job;
 
-import com.bilibili.syringa.core.client.OptionInit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
 
 /**
  *
@@ -51,6 +53,7 @@ public class MessageGenerator {
         messages = new HashMap<>(size);
 
         //
+        getMessage();
     }
 
     /**
@@ -64,7 +67,32 @@ public class MessageGenerator {
             return null;
         }
 
+        Preconditions.checkNotNull(CollectionUtils.isEmpty(jobMessageConfigList),
+            "jobMessageConfigList can not be nul");
+        for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
+
+            long size = jobMessageConfig.getSize();
+            byte[] data = generateProducerData(size);
+            messages.put(jobMessageConfig, String.valueOf(data));
+
+        }
+
         return null;
+    }
+
+    private byte[] generateProducerData(long dataSize) {
+
+        byte[] bytes = new byte[Math.toIntExact(dataSize)];
+        Random random = new Random();
+
+        LOGGER.info("the start date is {}", LocalDateTime.now());
+        for (int i = 0; i < bytes.length; ++i) {
+            bytes[i] = (byte) (random.nextInt() + 65);
+        }
+        LOGGER.info("the end date is {}", LocalDateTime.now());
+
+        return bytes;
+
     }
 
 }
