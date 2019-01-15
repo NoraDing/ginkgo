@@ -3,18 +3,17 @@
  */
 package com.bilibili.syringa.core.job;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
 
 /**
  *
@@ -55,6 +54,7 @@ public class MessageGenerator {
         int size = jobMessageConfigList.size();
 
         messages = new HashMap<>(size);
+        calDistribution();
     }
 
     /**
@@ -67,18 +67,38 @@ public class MessageGenerator {
             LOGGER.warn("should init first !");
             return null;
         }
+        int nextRandom = ThreadLocalRandom.current().nextInt(10);
+        locateAndAdd(nextRandom);
+        return null;
+    }
 
-        Preconditions.checkNotNull(CollectionUtils.isEmpty(jobMessageConfigList),
-            "jobMessageConfigList can not be nul");
+    private void locateAndAdd(int nextRandom) {
+
         for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
-
-            long size = jobMessageConfig.getSize();
-            byte[] data = generateData(size);
-            messages.put(jobMessageConfig, data);
+            int startScale = jobMessageConfig.getStartScale();
+            int endScale = jobMessageConfig.getEndScale();
+            if (nextRandom >= startScale && nextRandom <= endScale) {
+                long size = jobMessageConfig.getSize();
+                byte[] data = generateData(size);
+                messages.put(jobMessageConfig, data);
+                return;
+            }
 
         }
+    }
 
-        return null;
+    private void calDistribution() {
+
+        int basePercent = 0;
+        for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
+
+            double percent = jobMessageConfig.getPercent();
+            int intValue = BigDecimal.valueOf(percent).intValue();
+            jobMessageConfig.setStartScale(basePercent);
+            jobMessageConfig.setEndScale(intValue);
+            basePercent = +intValue;
+        }
+
     }
 
     private byte[] generateData(long dataSize) {
