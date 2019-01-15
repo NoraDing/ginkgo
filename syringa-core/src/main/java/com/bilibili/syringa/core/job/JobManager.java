@@ -55,18 +55,14 @@ public class JobManager extends AbstractIdleService {
         long threadMessage = new BigDecimal(messages).divide(new BigDecimal(concurrency))
             .longValue();
 
-        Collection<ListenableFuture> listenableFutureList = new ArrayList<>();
-
         for (int j = 0; j < concurrency; j++) {
             Job job = null;
             switch (syringaSystemConfig.getType()) {
                 case CONSUMER:
-                    job = new ConsumerJob("consumer-job-" + j, threadMessage,
-                        syringaSystemConfig.getTopicList());
+                    job = new ConsumerJob("consumer-job-" + j, threadMessage);
                     break;
                 case PRODUCER:
-                    job = new ProduceJob("producer-job-" + j, threadMessage,
-                        syringaSystemConfig.getTopicList());
+                    job = new ProduceJob("producer-job-" + j, threadMessage);
                     break;
                 default:
 

@@ -3,6 +3,8 @@
  */
 package com.bilibili.syringa.core.job;
 
+import com.google.common.util.concurrent.AbstractIdleService;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -20,41 +22,15 @@ import org.slf4j.LoggerFactory;
  * @author xuezhaoming
  * @version $Id: MessageGenerator.java, v 0.1 2019-01-15 2:07 PM Exp $$
  */
-public class MessageGenerator {
+public class MessageGenerator extends AbstractIdleService {
 
     private static final Logger           LOGGER = LoggerFactory.getLogger(MessageGenerator.class);
 
     private List<JobMessageConfig>        jobMessageConfigList;
     private Map<JobMessageConfig, byte[]> messages;
 
-    public void setJobMessageConfigList(List<JobMessageConfig> jobMessageConfigList) {
+    public MessageGenerator(List<JobMessageConfig> jobMessageConfigList) {
         this.jobMessageConfigList = jobMessageConfigList;
-    }
-
-    private AtomicBoolean init = new AtomicBoolean(false);
-
-    public static MessageGenerator instance() {
-        return new MessageGenerator();
-    }
-
-    public MessageGenerator messageConfig(List<JobMessageConfig> jobMessageConfigs) {
-        this.jobMessageConfigList = jobMessageConfigs;
-        return this;
-    }
-
-    public MessageGenerator build() {
-        init.compareAndSet(false, true);
-
-        init();
-        return this;
-    }
-
-    private void init() {
-
-        int size = jobMessageConfigList.size();
-
-        messages = new HashMap<>(size);
-        calDistribution();
     }
 
     /**
@@ -63,14 +39,8 @@ public class MessageGenerator {
      */
     public byte[] getMessage() {
 
-        if (!init.get()) {
-            LOGGER.warn("should init first !");
-            return null;
-        }
         int nextRandom = ThreadLocalRandom.current().nextInt(100);
-
         LOGGER.info("the nextRandom is {}", nextRandom);
-
         byte[] locateValue = locate(nextRandom);
         return locateValue;
     }
@@ -125,4 +95,17 @@ public class MessageGenerator {
 
     }
 
+    @Override
+    protected void startUp() throws Exception {
+
+        int size = jobMessageConfigList.size();
+
+        messages = new HashMap<>(size);
+        calDistribution();
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+
+    }
 }

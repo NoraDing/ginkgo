@@ -3,8 +3,11 @@
  */
 package com.bilibili.syringa.core;
 
+import com.google.common.eventbus.AsyncEventBus;
+
 import com.bilibili.syringa.core.client.OptionInit;
 import com.bilibili.syringa.core.config.SyringaSystemConfig;
+import com.bilibili.syringa.core.job.MessageGenerator;
 
 /**
  * @author xuezhaoming
@@ -16,7 +19,21 @@ public class SyringaContext {
 
     private OptionInit            optionInit;
 
+    private AsyncEventBus         asyncEventBus;
+
+    private MessageGenerator      messageGenerator;
+
     private boolean               isFinish;
+
+    private SyringaContext() {
+
+    }
+
+    public static SyringaContext getInstance() {
+        return syringaContext;
+    }
+
+    private SyringaSystemConfig syringaSystemConfig;
 
     public boolean isFinish() {
         return isFinish;
@@ -30,19 +47,25 @@ public class SyringaContext {
         return optionInit;
     }
 
+    public AsyncEventBus getAsyncEventBus() {
+        return asyncEventBus;
+    }
+
+    public void setAsyncEventBus(AsyncEventBus asyncEventBus) {
+        this.asyncEventBus = asyncEventBus;
+    }
+
     public void setOptionInit(OptionInit optionInit) {
         this.optionInit = optionInit;
     }
 
-    private SyringaContext() {
-
+    public MessageGenerator getMessageGenerator() {
+        return messageGenerator;
     }
 
-    public static SyringaContext getInstance() {
-        return syringaContext;
+    public void setMessageGenerator(MessageGenerator messageGenerator) {
+        this.messageGenerator = messageGenerator;
     }
-
-    private SyringaSystemConfig syringaSystemConfig;
 
     public SyringaSystemConfig getSyringaSystemConfig() {
         return syringaSystemConfig;

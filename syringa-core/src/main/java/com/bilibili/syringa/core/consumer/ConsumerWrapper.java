@@ -11,9 +11,9 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 /**
  *
  * @author dingsainan
- * @version $Id: ConsumerApp.java, v 0.1 2019-01-14 上午11:22 dingsainan Exp $$
+ * @version $Id: ConsumerWrapper.java, v 0.1 2019-01-14 上午11:22 dingsainan Exp $$
  */
-public class ConsumerApp  {
+public class ConsumerWrapper {
 
     //创建Kafka consumer
     private KafkaConsumer createConsumer(String groupId, String bootStrapServer) {
@@ -30,6 +30,5 @@ public class ConsumerApp  {
         return new KafkaConsumer<>(properties);
 
     }
-
 
 }
