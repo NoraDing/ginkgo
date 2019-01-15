@@ -3,6 +3,7 @@
  */
 package com.bilibili.syringa.core.job;
 
+import com.bilibili.syringa.core.config.SyringaSystemConfig;
 import com.bilibili.syringa.core.statistics.RunResult;
 
 import java.util.List;
@@ -14,12 +15,16 @@ import java.util.List;
  */
 public class ConsumerJob extends AbstractJob {
 
-    public ConsumerJob(String name, long messageCounter, List<String> topicList) {
-        super(name, messageCounter, topicList);
+    public ConsumerJob(String name, long messageCounter) {
+        super(name, messageCounter);
     }
 
     @Override
     public RunResult call() throws Exception {
+
+        for (String topic : topicList) {
+
+        }
         return null;
     }
 }

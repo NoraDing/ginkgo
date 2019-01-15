@@ -3,6 +3,7 @@
  */
 package com.bilibili.syringa.core.statistics;
 
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 
 import java.util.List;
@@ -24,10 +25,25 @@ public class ResultManager extends AbstractIdleService {
     @Override
     protected void startUp() throws Exception {
 
+        for (Future<RunResult> runResultFuture : futureList) {
+
+            RunResult runResult = runResultFuture.get();
+        }
+
+        shutDown();
+
     }
 
     @Override
     protected void shutDown() throws Exception {
 
     }
+
+    @Subscribe
+    public void listen(TaskEvent event) {
+
+        //todo
+
+    }
+
 }

@@ -20,10 +20,4 @@ public interface Job extends Callable<RunResult> {
      */
     String getName();
 
-    /**
-     * 是否运行
-     * @return true：运行中  false:未运行
-     */
-    boolean isRunning();
-
 }

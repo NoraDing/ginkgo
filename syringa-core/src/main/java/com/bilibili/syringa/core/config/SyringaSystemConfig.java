@@ -20,6 +20,7 @@ public class SyringaSystemConfig {
     private int                    concurrency;
     private List<JobMessageConfig> jobMessageConfigList;
     private List<String>           topicList;
+    private String                 servers;
 
     public TypeEnums getType() {
         return type;
@@ -69,10 +70,19 @@ public class SyringaSystemConfig {
         this.topicList = topicList;
     }
 
+    public String getServers() {
+        return servers;
+    }
+
+    public void setServers(String servers) {
+        this.servers = servers;
+    }
+
     @Override
     public String toString() {
         return "SyringaSystemConfig{" + "type=" + type + ", branches=" + branches + ", messages="
                + messages + ", concurrency=" + concurrency + ", jobMessageConfigList="
-               + jobMessageConfigList + ", topicList=" + topicList + '}';
+               + jobMessageConfigList + ", topicList=" + topicList + ", servers='" + servers + '\''
+               + '}';
     }
 }

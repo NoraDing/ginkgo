@@ -5,18 +5,26 @@ package com.bilibili.syringa.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.client.OptionInit;
 import com.bilibili.syringa.core.job.JobManager;
+import com.bilibili.syringa.core.job.MessageGenerator;
 import com.bilibili.syringa.core.statistics.ResultManager;
 import com.bilibili.syringa.core.statistics.RunResult;
+import com.bilibili.syringa.core.util.ThreadPoolExecutorFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 
@@ -41,20 +49,32 @@ public class Syringa {
 
             syringaContext.setOptionInit(optionInit);
 
-            //2.启动作业管理
+            //2.初始化消费发送器
+            MessageGenerator messageGenerator = new MessageGenerator(syringaContext
+                .getSyringaSystemConfig().getJobMessageConfigList());
+            syringaContext.setMessageGenerator(messageGenerator);
+            messageGenerator.startAsync().awaitRunning();
+
+            //3.启动作业管理
             JobManager jobManager = new JobManager(syringaContext.getSyringaSystemConfig());
 
             jobManager.startAsync().awaitRunning();
-            List<Future<RunResult>> run = jobManager.run();
+            List<Future<RunResult>> futureResults = jobManager.run();
 
-            while (!syringaContext.isFinish()) {
-                TimeUnit.MILLISECONDS.sleep(500);
-            }
+            //4.收集统计数据
+            ResultManager resultManager = new ResultManager(futureResults);
+            AsyncEventBus asyncEventBus = new AsyncEventBus(
+                ThreadPoolExecutorFactory.newThreadPoolExecutor("ResultManager-counter"));//todo
+            asyncEventBus.register(resultManager);
+            syringaContext.setAsyncEventBus(asyncEventBus);
 
-            //            ResultManager resultManager = new ResultManager();
+            resultManager.startAsync().awaitRunning();
 
+            //5.关闭各个服务
             optionInit.stopAsync().awaitRunning();
+            messageGenerator.stopAsync().awaitRunning();
             jobManager.stopAsync().awaitRunning();
+            resultManager.stopAsync().awaitRunning();
 
             LOGGER.info("finish ------------");
             System.exit(1);

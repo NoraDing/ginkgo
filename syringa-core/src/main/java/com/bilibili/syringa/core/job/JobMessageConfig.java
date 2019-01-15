@@ -52,4 +52,5 @@ public class JobMessageConfig {
         return "JobMessageConfig{" + "percent=" + percent + ", size=" + size + ", startScale="
                + startScale + ", endScale=" + endScale + '}';
     }
+
 }

@@ -3,9 +3,25 @@
  */
 package com.bilibili.syringa.core.job;
 
-import com.bilibili.syringa.core.statistics.RunResult;
+import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 
+import com.bilibili.syringa.core.config.SyringaSystemConfig;
+import com.bilibili.syringa.core.job.task.JobTask;
+import com.bilibili.syringa.core.producer.ProducerWrapper;
+import com.bilibili.syringa.core.producer.ProducerWrapperBuilder;
+import com.bilibili.syringa.core.statistics.RunResult;
+import com.bilibili.syringa.core.statistics.TaskEvent;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -14,17 +30,42 @@ import java.util.List;
  */
 public class ProduceJob extends AbstractJob {
 
-    public ProduceJob(String name, long messageCounter, List<String> topicList) {
-        super(name, messageCounter, topicList);
-    }
-
-    @Override
-    public boolean isRunning() {
-        return super.isRunning();
+    public ProduceJob(String name, long messageCounter) {
+        super(name, messageCounter);
     }
 
     @Override
     public RunResult call() throws Exception {
-        return null;
+
+        Collection<JobTask> jobTasks = new ArrayList<>(topicList.size());
+        for (String topic : topicList) {
+            ProducerWrapper instance = ProducerWrapperBuilder.instance(
+                syringaSystemConfig.getServers(), topic);
+            JobTask jobTask = new JobTask(instance, messageCounter);
+
+            ((ArrayList<JobTask>) jobTasks).add(jobTask);
+        }
+
+        List<Future<RunResult>> futures = listeningExecutorService.invokeAll(jobTasks);
+
+        //        for (Future<RunResult> future : futures) {
+        //            Futures.addCallback(future, new FutureCallback<V>() {
+        //                @Override
+        //                public void onSuccess(@Nullable V result) {
+        //
+        //                    //
+        //                    TaskEvent success = new TaskEvent();
+        //                    asyncEventBus.post(success);
+        //                }
+        //
+        //                @Override
+        //                public void onFailure(Throwable t) {
+        //                    TaskEvent failed = new TaskEvent();
+        //                    asyncEventBus.post(failed);
+        //                }
+        //            });
+        //        }
+
+        return new RunResult();
     }
 }

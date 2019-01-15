@@ -57,12 +57,14 @@ public class OptionInit extends AbstractIdleService {
             String concurrency = cli.getOptionValue("concurrency");//并发度
             String size = cli.getOptionValue("size");//请求大小分布  
             String topics = cli.getOptionValue("topics");//请求的主题
+            String servers = cli.getOptionValue("bootstrap.servers");//请求的kafka地址
 
             Preconditions.checkNotNull(type, "type is null");
             Preconditions.checkNotNull(messages, "messages is null");
             Preconditions.checkNotNull(concurrency, "concurrency is null");
             Preconditions.checkNotNull(size, "size is null");
             Preconditions.checkNotNull(topics, "topics is null");
+            Preconditions.checkNotNull(servers, "servers is null");
 
             //1.请求类型有效性检查  example -type 1 or 2 
             typeCheck(type);
@@ -80,6 +82,9 @@ public class OptionInit extends AbstractIdleService {
             List<String> topicLists = COMMA_SPLITTER.splitToList(topics);
             Preconditions.checkArgument(CollectionUtils.isNotEmpty(topicLists), "topic is empty");
             syringaSystemConfig.setTopicList(topicLists);
+
+            //6.kafka地址
+            syringaSystemConfig.setServers(servers);
 
             SyringaContext.getInstance().setSyringaSystemConfig(syringaSystemConfig);
         } catch (Exception e) {
@@ -187,6 +192,7 @@ public class OptionInit extends AbstractIdleService {
         options.addOption("c", "concurrency", true, "sender concurrency");
         options.addOption("s", "size", true, "message size");
         options.addOption("ts", "topics", true, "number of the topic ");
+        options.addOption("bs", "bootstrap.servers", true, "number of the topic ");
 
         return options;
     }
