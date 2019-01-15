@@ -61,43 +61,52 @@ public class MessageGenerator {
      * 返回构造的消息
      * @return
      */
-    public String getMessage() {
+    public byte[] getMessage() {
 
         if (!init.get()) {
             LOGGER.warn("should init first !");
             return null;
         }
-        int nextRandom = ThreadLocalRandom.current().nextInt(10);
-        locateAndAdd(nextRandom);
-        return null;
+        int nextRandom = ThreadLocalRandom.current().nextInt(100);
+
+        LOGGER.info("the nextRandom is {}", nextRandom);
+
+        byte[] locateValue = locate(nextRandom);
+        return locateValue;
     }
 
-    private void locateAndAdd(int nextRandom) {
+    private byte[] locate(int nextRandom) {
 
         for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
             int startScale = jobMessageConfig.getStartScale();
             int endScale = jobMessageConfig.getEndScale();
             if (nextRandom >= startScale && nextRandom <= endScale) {
+
                 long size = jobMessageConfig.getSize();
+                LOGGER.info("the percent is {} and the size is {}", jobMessageConfig.getPercent(),
+                    jobMessageConfig.getSize());
                 byte[] data = generateData(size);
                 messages.put(jobMessageConfig, data);
-                return;
+                return data;
             }
 
         }
+        return null;
     }
 
     private void calDistribution() {
 
-        int basePercent = 0;
+        int basePercent = 1;
         for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
 
             double percent = jobMessageConfig.getPercent();
-            int intValue = BigDecimal.valueOf(percent).intValue();
+            int intValue = basePercent + BigDecimal.valueOf(percent).intValue();
+            int end = basePercent + BigDecimal.valueOf(percent).intValue() - 1;
             jobMessageConfig.setStartScale(basePercent);
-            jobMessageConfig.setEndScale(intValue);
-            basePercent = +intValue;
+            jobMessageConfig.setEndScale(end);
+            basePercent = intValue;
         }
+        LOGGER.info("the calculate value  is {}", jobMessageConfigList.toString());
 
     }
 
