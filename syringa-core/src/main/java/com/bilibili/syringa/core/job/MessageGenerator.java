@@ -89,7 +89,6 @@ public class MessageGenerator {
                 messages.put(jobMessageConfig, data);
                 return data;
             }
-
         }
         return null;
     }
