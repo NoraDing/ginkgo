@@ -113,7 +113,7 @@ public class OptionInit extends AbstractIdleService {
             jobMessageConfig.setPercent(percentDouble);
 
             String messageSizeStr = strings.get(1);
-            Long messageSizeLong = parseMessageSizeStr(messageSizeStr);
+            Long messageSizeLong = parseMessageSizeStr(messageSizeStr.toLowerCase());
 
             Preconditions.checkNotNull(messageSizeLong != null, "messageSizeLong can not be null");
             jobMessageConfig.setSize(messageSizeLong);
@@ -129,8 +129,8 @@ public class OptionInit extends AbstractIdleService {
         syringaSystemConfig.setJobMessageConfigList(jobMessageConfigs);
     }
 
-    private Long parseMessageSizeStr(String messageSizeStr) {
-
+    //for test
+    public Long parseMessageSizeStr(String messageSizeStr) {
         int b = messageSizeStr.indexOf("b");
         int k = messageSizeStr.indexOf("k");
         int m = messageSizeStr.indexOf("m");
