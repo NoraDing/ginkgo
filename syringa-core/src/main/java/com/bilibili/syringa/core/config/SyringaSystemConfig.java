@@ -9,38 +9,21 @@ package com.bilibili.syringa.core.config;
  */
 public class SyringaSystemConfig {
 
-    private String appId;
+    private String appType;
     private String appNumber;
-    private String reqNumber;
+    private String reqTimes;
     private String pkgType;
-    private String partitionNumber;
-    private String totalMessageCount;
+    private String topicNumber;
+    private String nMessage;
     private String packageScale;
-    private String appConfig;        //To be determined
+    private String appConfig;
 
-    public SyringaSystemConfig() {
-
+    public String getAppType() {
+        return appType;
     }
 
-    public SyringaSystemConfig(String appId, String appNumber, String reqNumber, String pkgType,
-                               String partitionNumber, String totalMessageCount,
-                               String packageScale, String appConfig) {
-        this.appId = appId;
-        this.appNumber = appNumber;
-        this.reqNumber = reqNumber;
-        this.pkgType = pkgType;
-        this.partitionNumber = partitionNumber;
-        this.totalMessageCount = totalMessageCount;
-        this.packageScale = packageScale;
-        this.appConfig = appConfig;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
+    public void setAppType(String appType) {
+        this.appType = appType;
     }
 
     public String getAppNumber() {
@@ -51,12 +34,12 @@ public class SyringaSystemConfig {
         this.appNumber = appNumber;
     }
 
-    public String getReqNumber() {
-        return reqNumber;
+    public String getReqTimes() {
+        return reqTimes;
     }
 
-    public void setReqNumber(String reqNumber) {
-        this.reqNumber = reqNumber;
+    public void setReqTimes(String reqTimes) {
+        this.reqTimes = reqTimes;
     }
 
     public String getPkgType() {
@@ -67,20 +50,20 @@ public class SyringaSystemConfig {
         this.pkgType = pkgType;
     }
 
-    public String getPartitionNumber() {
-        return partitionNumber;
+    public String getTopicNumber() {
+        return topicNumber;
     }
 
-    public void setPartitionNumber(String partitionNumber) {
-        this.partitionNumber = partitionNumber;
+    public void setTopicNumber(String topicNumber) {
+        this.topicNumber = topicNumber;
     }
 
-    public String getTotalMessageCount() {
-        return totalMessageCount;
+    public String getnMessage() {
+        return nMessage;
     }
 
-    public void setTotalMessageCount(String totalMessageCount) {
-        this.totalMessageCount = totalMessageCount;
+    public void setnMessage(String nMessage) {
+        this.nMessage = nMessage;
     }
 
     public String getPackageScale() {
@@ -97,14 +80,5 @@ public class SyringaSystemConfig {
 
     public void setAppConfig(String appConfig) {
         this.appConfig = appConfig;
-    }
-
-    @Override
-    public String toString() {
-        return "SyringaSystemConfig{" + "appId='" + appId + '\'' + ", appNumber='" + appNumber
-               + '\'' + ", reqNumber='" + reqNumber + '\'' + ", pkgType='" + pkgType + '\''
-               + ", partitionNumber='" + partitionNumber + '\'' + ", totalMessageCount='"
-               + totalMessageCount + '\'' + ", packageScale='" + packageScale + '\''
-               + ", appConfig='" + appConfig + '\'' + '}';
     }
 }

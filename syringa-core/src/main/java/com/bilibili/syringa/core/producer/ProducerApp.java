@@ -3,9 +3,9 @@
  */
 package com.bilibili.syringa.core.producer;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-
 import java.util.Properties;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
 
 /**
  * @author dingsainan
@@ -14,9 +14,9 @@ import java.util.Properties;
 public class ProducerApp {
 
     //创建Kafka producer
-    public KafkaProducer createProducer() {
+    public KafkaProducer createProducer(String bootstrapServer) {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "10.23.58.141:9094");
+        props.put("bootstrap.servers", bootstrapServer);
         props.put("acks", "all");
         props.put("retries", 5);
         props.put("batch.size", 16384);
@@ -30,5 +30,4 @@ public class ProducerApp {
         return kafkaProducer;
 
     }
-
 }
