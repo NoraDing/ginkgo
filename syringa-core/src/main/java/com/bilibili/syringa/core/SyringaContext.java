@@ -3,6 +3,7 @@
  */
 package com.bilibili.syringa.core;
 
+import com.bilibili.syringa.core.client.OptionInit;
 import com.bilibili.syringa.core.config.SyringaSystemConfig;
 
 /**
@@ -12,6 +13,26 @@ import com.bilibili.syringa.core.config.SyringaSystemConfig;
 public class SyringaContext {
 
     private static SyringaContext syringaContext = new SyringaContext();
+
+    private OptionInit            optionInit;
+
+    private boolean               isFinish;
+
+    public boolean isFinish() {
+        return isFinish;
+    }
+
+    public void setFinish(boolean finish) {
+        isFinish = finish;
+    }
+
+    public OptionInit getOptionInit() {
+        return optionInit;
+    }
+
+    public void setOptionInit(OptionInit optionInit) {
+        this.optionInit = optionInit;
+    }
 
     private SyringaContext() {
 

@@ -29,7 +29,7 @@ public enum PackageTypeEnums {
 
     @Override
     public String toString() {
-        return "PackageTypeEnums{" + "type=" + type + ", scale=" + scale + ", dataSize=" + dataSize
+        return "PackageTypeEnums{" + "type=" + type + ", SCALE=" + scale + ", dataSize=" + dataSize
                + '}';
     }
 }

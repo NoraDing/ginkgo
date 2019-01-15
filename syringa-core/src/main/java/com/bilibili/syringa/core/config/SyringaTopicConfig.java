@@ -48,7 +48,7 @@ public class SyringaTopicConfig implements SyringaConfig {
 
     @Override
     public String toString() {
-        return "SyringaTopicConfig{" + "scale=" + scale + ", dataSize=" + dataSize
+        return "SyringaTopicConfig{" + "SCALE=" + scale + ", dataSize=" + dataSize
                + ", sharedCount=" + sharedCount + '}';
     }
 }

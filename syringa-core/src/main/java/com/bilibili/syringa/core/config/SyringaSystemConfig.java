@@ -3,82 +3,70 @@
  */
 package com.bilibili.syringa.core.config;
 
+import com.bilibili.syringa.core.enums.TypeEnums;
+import com.bilibili.syringa.core.job.JobMessageConfig;
+
+import java.util.List;
+
 /**
  * @author dingsainan
  * @version $Id: SyringaSystemConfig.java, v 0.1 2019-01-14 上午11:43 dingsainan Exp $$
  */
 public class SyringaSystemConfig {
 
-    private String appType;
-    private String appNumber;
-    private String reqTimes;
-    private String pkgType;
-    private String topicNumber;
-    private String nMessage;
-    private String packageScale;
-    private String appConfig;
+    private TypeEnums              type;
+    private int                    branches;
+    private long                   messages;
+    private int                    concurrency;
+    private List<JobMessageConfig> jobMessageConfigList;
+    private List<String>           topicList;
 
-    public String getAppType() {
-        return appType;
+    public TypeEnums getType() {
+        return type;
     }
 
-    public void setAppType(String appType) {
-        this.appType = appType;
+    public void setType(TypeEnums type) {
+        this.type = type;
     }
 
-    public String getAppNumber() {
-        return appNumber;
+    public int getBranches() {
+        return branches;
     }
 
-    public void setAppNumber(String appNumber) {
-        this.appNumber = appNumber;
+    public void setBranches(int branches) {
+        this.branches = branches;
     }
 
-    public String getReqTimes() {
-        return reqTimes;
+    public long getMessages() {
+        return messages;
     }
 
-    public void setReqTimes(String reqTimes) {
-        this.reqTimes = reqTimes;
+    public void setMessages(long messages) {
+        this.messages = messages;
     }
 
-    public String getPkgType() {
-        return pkgType;
+    public int getConcurrency() {
+        return concurrency;
     }
 
-    public void setPkgType(String pkgType) {
-        this.pkgType = pkgType;
+    public void setConcurrency(int concurrency) {
+        this.concurrency = concurrency;
     }
 
-    public String getTopicNumber() {
-        return topicNumber;
+    public List<JobMessageConfig> getJobMessageConfigList() {
+        return jobMessageConfigList;
     }
 
-    public void setTopicNumber(String topicNumber) {
-        this.topicNumber = topicNumber;
+    public void setJobMessageConfigList(List<JobMessageConfig> jobMessageConfigList) {
+        this.jobMessageConfigList = jobMessageConfigList;
     }
 
-    public String getnMessage() {
-        return nMessage;
+    public List<String> getTopicList() {
+        return topicList;
     }
 
-    public void setnMessage(String nMessage) {
-        this.nMessage = nMessage;
+    public void setTopicList(List<String> topicList) {
+        this.topicList = topicList;
     }
 
-    public String getPackageScale() {
-        return packageScale;
-    }
-
-    public void setPackageScale(String packageScale) {
-        this.packageScale = packageScale;
-    }
-
-    public String getAppConfig() {
-        return appConfig;
-    }
-
-    public void setAppConfig(String appConfig) {
-        this.appConfig = appConfig;
-    }
 }

@@ -40,7 +40,7 @@ public class ProducerExecutor implements Executor {
     public void execute() {
 
         int totalMessageCount = Integer.valueOf(syringaSystemConfig.getnMessage());
-        int appNumber = Integer.valueOf(syringaSystemConfig.getAppNumber());
+        int appNumber = Integer.valueOf(syringaSystemConfig.getTopics());
 
         //根据topic的个数，选择要进行produce的topic
         String topic = selectTopic();
