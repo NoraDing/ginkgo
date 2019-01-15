@@ -19,7 +19,6 @@ import com.bilibili.syringa.core.SyringaContext;
 import com.bilibili.syringa.core.config.SyringaSystemConfig;
 import com.bilibili.syringa.core.enums.TypeEnums;
 import com.bilibili.syringa.core.job.JobMessageConfig;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -114,11 +113,10 @@ public class OptionInit extends AbstractIdleService {
             jobMessageConfig.setPercent(percentDouble);
 
             String messageSizeStr = strings.get(1);
-            int k = messageSizeStr.indexOf("k");
+            Long messageSizeLong = parseMessageSizeStr(messageSizeStr.toLowerCase());
 
-            Preconditions.checkArgument(k > 0);
-            Long messageSize = Long.valueOf(messageSizeStr.substring(0, k));
-            jobMessageConfig.setSize(messageSize * SCALE);
+            Preconditions.checkNotNull(messageSizeLong != null, "messageSizeLong can not be null");
+            jobMessageConfig.setSize(messageSizeLong);
             jobMessageConfigs.add(jobMessageConfig);
 
         }
@@ -129,6 +127,37 @@ public class OptionInit extends AbstractIdleService {
         Preconditions.checkArgument(totalPercent == 1, "percent is sum should be 1");
 
         syringaSystemConfig.setJobMessageConfigList(jobMessageConfigs);
+    }
+
+    //for test
+    public Long parseMessageSizeStr(String messageSizeStr) {
+        int b = messageSizeStr.indexOf("b");
+        int k = messageSizeStr.indexOf("k");
+        int m = messageSizeStr.indexOf("m");
+
+        if (b > 0 && k < 0 && m < 0) {
+            long size = Long.valueOf(messageSizeStr.substring(0, b));
+
+            return size;
+
+        }
+
+        if (k > 0 && b < 0 && m < 0) {
+            long size = Long.valueOf(messageSizeStr.substring(0, k)) * SCALE;
+
+            return size;
+
+        }
+
+        if (m > 0 && b < 0 && k < 0) {
+            long size = Long.valueOf(messageSizeStr.substring(0, m)) * SCALE * SCALE;
+
+            return size;
+
+        }
+
+        return null;
+
     }
 
     private void concurrencyCheck(String concurrency) {

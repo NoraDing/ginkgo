@@ -3,19 +3,15 @@
  */
 package com.bilibili.syringa.core.executor;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.config.SyringaSystemConfig;
 import com.bilibili.syringa.core.config.SyringaTopicConfig;
-import com.bilibili.syringa.core.enums.DataSizeEnums;
 import com.bilibili.syringa.core.producer.ProducerApp;
 
 /**
@@ -39,8 +35,8 @@ public class ProducerExecutor implements Executor {
     @Override
     public void execute() {
 
-        int totalMessageCount = Integer.valueOf(syringaSystemConfig.getnMessage());
-        int appNumber = Integer.valueOf(syringaSystemConfig.getTopics());
+        int totalMessageCount = 0; //= Integer.valueOf(syringaSystemConfig.getMessages());
+        int appNumber = 0; //= Integer.valueOf(syringaSystemConfig.getTopicList());
 
         //根据topic的个数，选择要进行produce的topic
         String topic = selectTopic();
@@ -69,27 +65,12 @@ public class ProducerExecutor implements Executor {
     /**
      * 根据数据包的类型，生成数据
      */
-    private byte[] generateProducerData(int dataSize) {
-
-        byte[] bytes = new byte[dataSize];
-        Random random = new Random();
-        LOGGER.info("the start date is {}", LocalDateTime.now());
-        for (int i = 0; i < bytes.length; ++i) {
-            bytes[i] = (byte) random.nextInt();
-        }
-        LOGGER.info("the end date is {}", LocalDateTime.now());
-
-        return bytes;
-
-    }
 
     private void sendData(int totalMessageCount, String topic) {
-        KafkaProducer kafkaProducer = producerApp.createProducer();
+        KafkaProducer kafkaProducer = producerApp.createProducer("");
         if (CollectionUtils.isEmpty(syringaTopicConfigs)) {
             long startDate = System.currentTimeMillis();
             while (totalMessageCount > 0) {
-                byte[] generateSize = generateProducerData(DataSizeEnums.OneM.getValue());
-                kafkaProducer.send(new ProducerRecord<>(topic, String.valueOf(generateSize)));
                 totalMessageCount--;
             }
             long endDate = System.currentTimeMillis();
