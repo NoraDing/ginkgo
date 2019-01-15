@@ -3,7 +3,6 @@
  */
 package com.bilibili.syringa.core.client;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,10 +100,9 @@ public class OptionInit extends AbstractIdleService {
             }
 
             JobMessageConfig jobMessageConfig = new JobMessageConfig();
+
             String percentStr = strings.get(0);
-            BigDecimal bigDecimal = new BigDecimal(percentStr);
-            double percentDouble = bigDecimal.divide(new BigDecimal(100), BigDecimal.ROUND_DOWN, 2)
-                .doubleValue();
+            double percentDouble = Double.valueOf(percentStr);
             jobMessageConfig.setPercent(percentDouble);
 
             String messageSizeStr = strings.get(1);
