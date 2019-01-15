@@ -137,23 +137,17 @@ public class OptionInit extends AbstractIdleService {
 
         if (b > 0 && k < 0 && m < 0) {
             long size = Long.valueOf(messageSizeStr.substring(0, b));
-
             return size;
-
         }
 
         if (k > 0 && b < 0 && m < 0) {
             long size = Long.valueOf(messageSizeStr.substring(0, k)) * SCALE;
-
             return size;
-
         }
 
         if (m > 0 && b < 0 && k < 0) {
             long size = Long.valueOf(messageSizeStr.substring(0, m)) * SCALE * SCALE;
-
             return size;
-
         }
 
         return null;
