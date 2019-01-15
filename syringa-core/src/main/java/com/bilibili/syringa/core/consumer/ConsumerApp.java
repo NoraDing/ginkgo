@@ -7,15 +7,13 @@ package com.bilibili.syringa.core.consumer;
 import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author dingsainan
  * @version $Id: ConsumerApp.java, v 0.1 2019-01-14 上午11:22 dingsainan Exp $$
  */
-@Component
-public class ConsumerApp {
+public class ConsumerApp  {
 
     //创建Kafka consumer
     private KafkaConsumer createConsumer(String groupId, String bootStrapServer) {
@@ -32,4 +30,6 @@ public class ConsumerApp {
         return new KafkaConsumer<>(properties);
 
     }
+
+
 }

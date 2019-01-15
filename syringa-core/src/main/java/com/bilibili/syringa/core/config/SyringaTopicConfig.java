@@ -11,29 +11,31 @@ import com.bilibili.syringa.core.SyringaConfig;
  */
 public class SyringaTopicConfig implements SyringaConfig {
 
-    private int scaleType;   //百分比类型
-    private int dataSizeType; //大小类型
-    private int sharedCount; //
+    private int scale;       //所占百分比
+    private int dataSize;    //数据大小
+    private int sharedCount; //占用消息总数的大小
 
-    public SyringaTopicConfig(int scaleType, int dataSizeType) {
-        this.scaleType = scaleType;
-        this.dataSizeType = dataSizeType;
+
+    public SyringaTopicConfig(int scale, int dataSize, int sharedCount) {
+        this.scale = scale;
+        this.dataSize = dataSize;
+        this.sharedCount = sharedCount;
     }
 
-    public int getScaleType() {
-        return scaleType;
+    public int getScale() {
+        return scale;
     }
 
-    public void setScaleType(int scaleType) {
-        this.scaleType = scaleType;
+    public void setScale(int scale) {
+        this.scale = scale;
     }
 
-    public int getDataSizeType() {
-        return dataSizeType;
+    public int getDataSize() {
+        return dataSize;
     }
 
-    public void setDataSizeType(int dataSizeType) {
-        this.dataSizeType = dataSizeType;
+    public void setDataSize(int dataSize) {
+        this.dataSize = dataSize;
     }
 
     public int getSharedCount() {
@@ -46,7 +48,7 @@ public class SyringaTopicConfig implements SyringaConfig {
 
     @Override
     public String toString() {
-        return "SyringaTopicConfig{" + "scaleType=" + scaleType + ", dataSizeType=" + dataSizeType
+        return "SyringaTopicConfig{" + "scale=" + scale + ", dataSize=" + dataSize
                + ", sharedCount=" + sharedCount + '}';
     }
 }

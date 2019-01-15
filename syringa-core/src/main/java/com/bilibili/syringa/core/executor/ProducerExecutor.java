@@ -3,12 +3,9 @@
  */
 package com.bilibili.syringa.core.executor;
 
-import com.bilibili.syringa.core.config.SyringaSystemConfig;
-import com.bilibili.syringa.core.config.SyringaTopicConfig;
-import com.bilibili.syringa.core.enums.DataSizeEnums;
-import com.bilibili.syringa.core.enums.ScalePercentEnums;
-import com.bilibili.syringa.core.producer.ProducerApp;
-import com.bilibili.syringa.core.tool.CalculateUtils;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -16,10 +13,10 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.bilibili.syringa.core.config.SyringaSystemConfig;
+import com.bilibili.syringa.core.config.SyringaTopicConfig;
+import com.bilibili.syringa.core.enums.DataSizeEnums;
+import com.bilibili.syringa.core.producer.ProducerApp;
 
 /**
  * @author dingsainan
@@ -34,7 +31,7 @@ public class ProducerExecutor implements Executor {
         this.syringaSystemConfig = syringaSystemConfig;
     }
 
-    private ProducerApp producerApp;
+    private ProducerApp              producerApp;
 
     private List<SyringaTopicConfig> syringaTopicConfigs;
 
@@ -42,9 +39,8 @@ public class ProducerExecutor implements Executor {
     @Override
     public void execute() {
 
-        int totalMessageCount = Integer.valueOf(syringaSystemConfig.getTotalMessageCount());
+        int totalMessageCount = Integer.valueOf(syringaSystemConfig.getnMessage());
         int appNumber = Integer.valueOf(syringaSystemConfig.getAppNumber());
-        syringaTopicConfigs = parsePackageScale(syringaSystemConfig.getPackageScale());
 
         //根据topic的个数，选择要进行produce的topic
         String topic = selectTopic();
@@ -57,33 +53,6 @@ public class ProducerExecutor implements Executor {
         }
 
         //根据数据包的类型，生成数据
-
-    }
-
-    private List<SyringaTopicConfig> parsePackageScale(String value) {
-
-        List<SyringaTopicConfig> syringaTopicConfigs = new ArrayList<>();
-
-        // sample="1:1;2:1;3:2"
-        String[] splits = value.split(";");
-        if (splits == null || splits.length == 0) {
-            return null;
-        }
-        for (String split : splits) {
-            String[] kv = split.split(":");
-            if (kv == null || kv.length != 2) {
-                continue;
-            }
-
-            int scaleType = Integer.valueOf(kv[0]);
-            int packageSizeType = Integer.valueOf(kv[1]);
-
-
-            syringaTopicConfigs.add(new SyringaTopicConfig(scaleType, packageSizeType));
-
-        }
-
-        return syringaTopicConfigs;
 
     }
 
@@ -133,11 +102,6 @@ public class ProducerExecutor implements Executor {
         if (CollectionUtils.isNotEmpty(syringaTopicConfigs)) {
             int finalTotalMessageCount = totalMessageCount;
             syringaTopicConfigs.stream().forEach(syringaTopicConfig -> {
-                int scaleType = syringaTopicConfig.getScaleType();
-                int dataSizeType = syringaTopicConfig.getDataSizeType();
-                int scale = ScalePercentEnums.getValueByType(scaleType);
-                int dataSize = DataSizeEnums.getValueByType(dataSizeType);
-                int sharedCount = CalculateUtils.mutiple(finalTotalMessageCount, scale);
 
             });
 
