@@ -20,7 +20,12 @@ public class OptionInitTest extends BaseTest {
 
     @Test
     public void initTest() {
-        String[] args = new String[] { "" };
+
+        String[] args = new String[] { "-type", "1", "-message", "1000", "-concurrency", "5",
+                                       "-size", "10=4k,20=1k,30=6k,40=7k", "-topics",
+                                       "topic1,topic2", "-bootstrap.servers", "localhost:9092",
+                                       "-configPath",
+                                       "/Users/dingsainan/soft/kafka_2.11-2.1.0/config/producer.properties" };
         OptionInit optionInit = new OptionInit(args);
         optionInit.startAsync().awaitRunning();
 

@@ -4,7 +4,6 @@
 package com.bilibili.syringa.core.client;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -101,6 +100,7 @@ public class OptionInit extends AbstractIdleService {
                 Properties properties = generateProperties(configPath);
                 syringaSystemConfig.setProperties(properties);
             }
+            LOGGER.info("the syringaSystemConfig is {}", syringaSystemConfig.toString());
 
             SyringaContext.getInstance().setSyringaSystemConfig(syringaSystemConfig);
         } catch (Exception e) {
@@ -111,12 +111,17 @@ public class OptionInit extends AbstractIdleService {
     }
 
     @VisibleForTesting
-    public Properties generateProperties(String fileName) {
+    public Properties generateProperties(String configPath) {
 
         Properties properties = new Properties();
-
         try {
-            List<String> contents = Files.readAllLines(Paths.get(URI.create(fileName)));
+            List<String> contents = null;
+            int index = configPath.lastIndexOf("/");
+            String location = configPath.substring(0, index);
+            String fileName = configPath.substring(index + 1, configPath.length()).trim();
+
+            contents = Files.readAllLines(Paths.get(location, fileName));
+
             for (String content : contents) {
                 if (content == null || content.startsWith("#") || !content.contains("=")) {
                     continue;
@@ -168,7 +173,7 @@ public class OptionInit extends AbstractIdleService {
         double totalPercent = jobMessageConfigs.stream().mapToDouble(JobMessageConfig::getPercent)
             .sum();
 
-        Preconditions.checkArgument(totalPercent == 1, "percent is sum should be 1");
+        Preconditions.checkArgument(totalPercent == 100, "percent is sum should be 1");
 
         syringaSystemConfig.setJobMessageConfigList(jobMessageConfigs);
     }
@@ -201,7 +206,7 @@ public class OptionInit extends AbstractIdleService {
     private void concurrencyCheck(String concurrency) {
 
         Integer concurrencyInt = Integer.valueOf(concurrency);
-        if (concurrencyInt < 0) {
+        if (concurrencyInt <= 0) {
             LOGGER.error("invalid concurrency {}  muster bigger than zero !", concurrency);
             System.exit(-1);
         }
@@ -213,7 +218,7 @@ public class OptionInit extends AbstractIdleService {
     private void messagesCheck(String messages) {
 
         Long messagesLong = Long.valueOf(messages);
-        if (messagesLong < 0) {
+        if (messagesLong <= 0) {
             LOGGER.error("invalid messages {}  muster bigger than zero !", messages);
             System.exit(-1);
         }

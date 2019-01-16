@@ -29,6 +29,10 @@ public class MessageGenerator extends AbstractIdleService {
     private List<JobMessageConfig>        jobMessageConfigList;
     private Map<JobMessageConfig, byte[]> messages;
 
+    public Map<JobMessageConfig, byte[]> getMessages() {
+        return messages;
+    } 
+
     public MessageGenerator(List<JobMessageConfig> jobMessageConfigList) {
         this.jobMessageConfigList = jobMessageConfigList;
     }

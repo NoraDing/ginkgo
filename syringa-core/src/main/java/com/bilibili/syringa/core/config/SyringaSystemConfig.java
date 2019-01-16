@@ -16,7 +16,6 @@ import com.bilibili.syringa.core.job.JobMessageConfig;
 public class SyringaSystemConfig {
 
     private TypeEnums              type;
-    private int                    branches;
     private long                   messages;
     private int                    concurrency;
     private List<JobMessageConfig> jobMessageConfigList;
@@ -30,14 +29,6 @@ public class SyringaSystemConfig {
 
     public void setType(TypeEnums type) {
         this.type = type;
-    }
-
-    public int getBranches() {
-        return branches;
-    }
-
-    public void setBranches(int branches) {
-        this.branches = branches;
     }
 
     public long getMessages() {
@@ -90,9 +81,8 @@ public class SyringaSystemConfig {
 
     @Override
     public String toString() {
-        return "SyringaSystemConfig{" + "type=" + type + ", branches=" + branches + ", messages="
-               + messages + ", concurrency=" + concurrency + ", jobMessageConfigList="
-               + jobMessageConfigList + ", topicList=" + topicList + ", servers='" + servers + '\''
-               + ", properties=" + properties + '}';
+        return "SyringaSystemConfig{" + "type=" + type + ", messages=" + messages + ", concurrency="
+               + concurrency + ", jobMessageConfigList=" + jobMessageConfigList + ", topicList="
+               + topicList + ", servers='" + servers + '\'' + ", properties=" + properties + '}';
     }
 }

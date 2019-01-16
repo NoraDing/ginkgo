@@ -26,7 +26,7 @@ import com.google.common.util.concurrent.MoreExecutors;
  */
 public class JobManager extends AbstractIdleService {
 
-    private static final Logger      LOGGER = LoggerFactory.getLogger(JobManager.class);
+    private static final Logger      LOGGER  = LoggerFactory.getLogger(JobManager.class);
 
     private SyringaSystemConfig      syringaSystemConfig;
 
@@ -34,9 +34,9 @@ public class JobManager extends AbstractIdleService {
 
     private MessageGenerator         messageGenerator;
 
-    private Collection<Job>          runJob = new ArrayList<>();
+    private Collection<Job>          runJob  = new ArrayList<>();
 
-    private List<Future<RunResult>>  futures;
+    private List<Future<RunResult>>  futures = new ArrayList<>();
 
     public JobManager(SyringaSystemConfig syringaSystemConfig, MessageGenerator messageGenerator) {
         this.syringaSystemConfig = syringaSystemConfig;

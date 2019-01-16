@@ -5,9 +5,13 @@
 package com.bilibili.syringa.core.job;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.BaseTest;
 
@@ -17,6 +21,7 @@ import com.bilibili.syringa.core.BaseTest;
  * @version $Id: MessageGeneratorTest.java, v 0.1 2019-01-15 下午2:50 dingsainan Exp $$
  */
 public class MessageGeneratorTest extends BaseTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageGeneratorTest.class);
 
     @Test
     public void getMessageTest() {
@@ -42,6 +47,18 @@ public class MessageGeneratorTest extends BaseTest {
         jobMessageConfigList.add(jobMessageConfig2);
         jobMessageConfigList.add(jobMessageConfig3);
         jobMessageConfigList.add(jobMessageConfig4);
+        MessageGenerator messageGenerator = new MessageGenerator(jobMessageConfigList);
+        messageGenerator.startAsync().awaitRunning();
+        Map<JobMessageConfig, byte[]> messages = messageGenerator.getMessages();
+        Iterator<Map.Entry<JobMessageConfig, byte[]>> iterator = messages.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<JobMessageConfig, byte[]> next = iterator.next();
+            LOGGER.info("the next key is {}", next.getKey());
+            LOGGER.info("the next value is {}", next.getValue().length);
+        }
+
+        byte[] message = messageGenerator.getMessage();
+        LOGGER.info("the next value is {}", message);
 
 
     }

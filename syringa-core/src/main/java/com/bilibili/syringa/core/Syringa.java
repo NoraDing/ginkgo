@@ -42,8 +42,8 @@ public class Syringa {
             //2.初始化消费发送器
             MessageGenerator messageGenerator = new MessageGenerator(
                 syringaContext.getSyringaSystemConfig().getJobMessageConfigList());
-            syringaContext.setMessageGenerator(messageGenerator);
             messageGenerator.startAsync().awaitRunning();
+            syringaContext.setMessageGenerator(messageGenerator);
 
             //3.启动作业管理
             JobManager jobManager = new JobManager(syringaContext.getSyringaSystemConfig(),

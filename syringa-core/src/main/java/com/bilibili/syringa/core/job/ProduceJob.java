@@ -25,7 +25,7 @@ import com.bilibili.syringa.core.statistics.RunResult;
 public class ProduceJob extends AbstractJob {
     private static final Logger     LOGGER = LoggerFactory.getLogger(ConsumerJob.class);
 
-    private List<Future<RunResult>> futures;
+    private List<Future<RunResult>> futures=new ArrayList<>();
 
     public List<Future<RunResult>> getFutures() {
         return futures;
