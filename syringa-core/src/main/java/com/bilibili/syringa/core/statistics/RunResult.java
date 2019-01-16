@@ -17,6 +17,7 @@ public class RunResult {
     private LocalDateTime finishDate;
     private long          sizePer;
     private long          message;
+    private long          totalSize;
 
     public boolean isSuccess() {
         return success;
@@ -56,5 +57,13 @@ public class RunResult {
 
     public void setMessage(long message) {
         this.message = message;
+    }
+
+    public long getTotalSize() {
+        return totalSize;
+    }
+
+    public void setTotalSize(long totalSize) {
+        this.totalSize = totalSize;
     }
 }

@@ -3,6 +3,7 @@
  */
 package com.bilibili.syringa.core.job.task;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.Callable;
@@ -21,6 +22,7 @@ import com.bilibili.syringa.core.statistics.RunResult;
 public class ProducerJobTask implements Callable<RunResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProducerJobTask.class);
+    private static final int    SCALE  = 1024;
 
     private ProducerWrapper     producerWrapper;
     private long                messageCounter;
@@ -40,12 +42,11 @@ public class ProducerJobTask implements Callable<RunResult> {
         }
 
         //直接输出结果
-        LOGGER.info("start.time, end.time,total.data.sent.in.MB, MB.sec, "
-                    + "total.data.sent.in.nMsg, nMsg.sec");
         long message = runResult.getMessage();
         long sizePer = runResult.getSizePer();
+        long totalSize= BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(sizePer))
+            .divide(BigDecimal.valueOf(SCALE)).divide(BigDecimal.valueOf(SCALE)).longValue();
 
-        long totalSize = message * sizePer / 1024 / 1024;
         LocalDateTime startDate = runResult.getStartDate();
         LocalDateTime finishDate = runResult.getFinishDate();
         long duration = Duration.between(startDate, finishDate).getSeconds();

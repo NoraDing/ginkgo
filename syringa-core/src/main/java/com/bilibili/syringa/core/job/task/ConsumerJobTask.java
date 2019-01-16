@@ -4,6 +4,7 @@
  */
 package com.bilibili.syringa.core.job.task;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.Callable;
@@ -44,14 +45,15 @@ public class ConsumerJobTask implements Callable<RunResult> {
         LocalDateTime startDate = runResult.getStartDate();
         LocalDateTime finishDate = runResult.getFinishDate();
         long message = runResult.getMessage();
-        long sizePer = runResult.getSizePer();
-
+        long totalSize = runResult.getTotalSize();
         long duration = Duration.between(startDate, finishDate).getSeconds();
 
-        LOGGER.info(
-            "start.time, end.time, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec");
-        LOGGER.info("{},{},{},{}", startDate, finishDate, sizePer / SCALE / SCALE,
-            sizePer / SCALE / SCALE / duration, message, message / duration);
+        double MBSec = BigDecimal.valueOf(totalSize).divide(BigDecimal.valueOf(SCALE))
+            .divide(BigDecimal.valueOf(SCALE)).divide(BigDecimal.valueOf(duration)).doubleValue();
+        double nMsgSec = BigDecimal.valueOf(totalSize).divide(BigDecimal.valueOf(duration))
+            .doubleValue();
+
+        LOGGER.info("{},{},{},{}", startDate, finishDate, totalSize, MBSec, message, nMsgSec);
 
         return runResult;
     }

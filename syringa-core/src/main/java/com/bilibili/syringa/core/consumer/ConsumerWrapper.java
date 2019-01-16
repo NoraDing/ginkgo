@@ -45,7 +45,7 @@ public class ConsumerWrapper {
         runResult.setMessage(runResult.getMessage() + count);
         for (ConsumerRecord<String, String> record : records) {
             int size = record.key().getBytes().length;
-            runResult.setSizePer(runResult.getSizePer() + size);
+            runResult.setTotalSize(runResult.getTotalSize() + size);
         }
 
         runResult.setFinishDate(LocalDateTime.now());
