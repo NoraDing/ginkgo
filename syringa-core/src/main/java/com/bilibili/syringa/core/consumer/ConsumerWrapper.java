@@ -4,9 +4,16 @@
  */
 package com.bilibili.syringa.core.consumer;
 
-import java.util.Properties;
+import java.time.LocalDateTime;
+import java.util.Collections;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.bilibili.syringa.core.statistics.RunResult;
 
 /**
  *
@@ -15,20 +22,33 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
  */
 public class ConsumerWrapper {
 
-    //创建Kafka consumer
-    private KafkaConsumer createConsumer(String groupId, String bootStrapServer) {
-        Properties properties = new Properties();
-        properties.put("bootstrap.servers", bootStrapServer);
-        properties.put("group.id", groupId);
-        properties.put("enable.auto.commit", true);
-        properties.put("auto.commit.interval.ms", 1000);
-        properties.put("key.deserializer",
-            "org.apache.kafka.common.serialization.StringDeserializer");
-        properties.put("value.deserializer",
-            "org.apache.kafka.common.serialization.StringDeserializer");
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerWrapper.class);
 
-        return new KafkaConsumer<>(properties);
+    private KafkaConsumer       kafkaConsumer;
 
+    private String              topic;
+
+    public ConsumerWrapper(KafkaConsumer kafkaConsumer, String topic) {
+        this.kafkaConsumer = kafkaConsumer;
+        this.topic = topic;
+
+    }
+
+    public void pollMessage(RunResult runResult) {
+        if (runResult.getStartDate() == null) {
+            runResult.setStartDate(LocalDateTime.now());
+        }
+
+        kafkaConsumer.subscribe(Collections.singleton(topic));
+        ConsumerRecords<String, String> records = kafkaConsumer.poll(100);
+        int count = records.count();
+        runResult.setMessage(runResult.getMessage() + count);
+        for (ConsumerRecord<String, String> record : records) {
+            int size = record.key().getBytes().length;
+            runResult.setSizePer(runResult.getSizePer() + size);
+        }
+
+        runResult.setFinishDate(LocalDateTime.now());
     }
 
 }

@@ -10,8 +10,8 @@ package com.bilibili.syringa.core.producer;
  */
 public class ProducerWrapperBuilderTest {
 
-    public void builder(){
+    public void builder() {
         String servers = "";
-        ProducerWrapper producerWrapper =  ProducerWrapperBuilder.instance(servers, topic);
+        //        ProducerWrapper producerWrapper =  ProducerWrapperBuilder.instance(servers, topic);
     }
 }

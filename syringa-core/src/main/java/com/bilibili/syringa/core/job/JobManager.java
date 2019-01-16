@@ -3,25 +3,21 @@
  */
 package com.bilibili.syringa.core.job;
 
-import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-
-import com.bilibili.syringa.core.Syringa;
-import com.bilibili.syringa.core.config.SyringaSystemConfig;
-import com.bilibili.syringa.core.statistics.RunResult;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.bilibili.syringa.core.config.SyringaSystemConfig;
+import com.bilibili.syringa.core.properties.Properties;
+import com.bilibili.syringa.core.statistics.RunResult;
+import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 
 /**
  *
@@ -36,10 +32,13 @@ public class JobManager extends AbstractIdleService {
 
     private ListeningExecutorService listeningExecutorService;
 
+    private MessageGenerator         messageGenerator;
+
     private Collection<Job>          runJob = new ArrayList<>();
 
-    public JobManager(SyringaSystemConfig syringaSystemConfig) {
+    public JobManager(SyringaSystemConfig syringaSystemConfig, MessageGenerator messageGenerator) {
         this.syringaSystemConfig = syringaSystemConfig;
+        this.messageGenerator = messageGenerator;
 
         listeningExecutorService = MoreExecutors.newDirectExecutorService();
     }
@@ -52,6 +51,7 @@ public class JobManager extends AbstractIdleService {
         //转配成作业的配置
         long messages = syringaSystemConfig.getMessages();
         int concurrency = syringaSystemConfig.getConcurrency();
+        List<Properties> properties = syringaSystemConfig.getProperties();
         long threadMessage = new BigDecimal(messages).divide(new BigDecimal(concurrency))
             .longValue();
 
@@ -59,10 +59,12 @@ public class JobManager extends AbstractIdleService {
             Job job = null;
             switch (syringaSystemConfig.getType()) {
                 case CONSUMER:
-                    job = new ConsumerJob("consumer-job-" + j, threadMessage);
+                    job = new ConsumerJob("consumer-job-" + j, threadMessage, messageGenerator,
+                        properties);
                     break;
                 case PRODUCER:
-                    job = new ProduceJob("producer-job-" + j, threadMessage);
+                    job = new ProduceJob("producer-job-" + j, threadMessage, messageGenerator,
+                        properties);
                     break;
                 default:
 
@@ -71,8 +73,6 @@ public class JobManager extends AbstractIdleService {
             runJob.add(job);
 
         }
-
-        //运行作业
     }
 
     public List<Future<RunResult>> run() throws InterruptedException {

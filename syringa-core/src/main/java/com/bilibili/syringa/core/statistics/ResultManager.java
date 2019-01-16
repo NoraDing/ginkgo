@@ -3,11 +3,11 @@
  */
 package com.bilibili.syringa.core.statistics;
 
-import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.AbstractIdleService;
-
 import java.util.List;
 import java.util.concurrent.Future;
+
+import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.AbstractIdleService;
 
 /**
  *
@@ -28,6 +28,11 @@ public class ResultManager extends AbstractIdleService {
         for (Future<RunResult> runResultFuture : futureList) {
 
             RunResult runResult = runResultFuture.get();
+
+            TaskEvent taskEvent = new TaskEvent();
+            listen(taskEvent);
+            boolean success = runResult.isSuccess();
+
         }
 
         shutDown();

@@ -3,22 +3,22 @@
  */
 package com.bilibili.syringa.core.job;
 
-import com.google.common.util.concurrent.AbstractIdleService;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.AbstractIdleService;
+
 /**
- *
  * @author xuezhaoming
  * @version $Id: MessageGenerator.java, v 0.1 2019-01-15 2:07 PM Exp $$
  */
@@ -35,6 +35,7 @@ public class MessageGenerator extends AbstractIdleService {
 
     /**
      * 返回构造的消息
+     *
      * @return
      */
     public byte[] getMessage() {
@@ -47,17 +48,16 @@ public class MessageGenerator extends AbstractIdleService {
 
     private byte[] locate(int nextRandom) {
 
-        for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
-            int startScale = jobMessageConfig.getStartScale();
-            int endScale = jobMessageConfig.getEndScale();
+        Iterator<Map.Entry<JobMessageConfig, byte[]>> iterator = messages.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<JobMessageConfig, byte[]> next = iterator.next();
+            JobMessageConfig key = next.getKey();
+            byte[] value = next.getValue();
+            int startScale = key.getStartScale();
+            int endScale = key.getEndScale();
             if (nextRandom >= startScale && nextRandom <= endScale) {
+                return value;
 
-                long size = jobMessageConfig.getSize();
-                LOGGER.info("the percent is {} and the size is {}", jobMessageConfig.getPercent(),
-                    jobMessageConfig.getSize());
-                byte[] data = generateData(size);
-                messages.put(jobMessageConfig, data);
-                return data;
             }
         }
         return null;
@@ -79,18 +79,24 @@ public class MessageGenerator extends AbstractIdleService {
 
     }
 
-    private byte[] generateData(long dataSize) {
+    private void generateData() {
+        Preconditions.checkNotNull(jobMessageConfigList, "jobMessageConfigList can not be empty");
 
-        byte[] bytes = new byte[Math.toIntExact(dataSize)];
-        Random random = new Random();
+        for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
+            long dataSize = jobMessageConfig.getSize();
+            byte[] bytes = new byte[Math.toIntExact(dataSize)];
+            Random random = new Random();
 
-        LOGGER.info("the start date is {}", LocalDateTime.now());
-        for (int i = 0; i < bytes.length; ++i) {
-            bytes[i] = (byte) (random.nextInt() + 65);
+            LOGGER.info("the start date is {}", LocalDateTime.now());
+            for (int i = 0; i < bytes.length; ++i) {
+                bytes[i] = (byte) (random.nextInt() + 65);
+            }
+
+            messages.put(jobMessageConfig, bytes);
+
         }
-        LOGGER.info("the end date is {}", LocalDateTime.now());
 
-        return bytes;
+        LOGGER.info("the end date is {}", LocalDateTime.now());
 
     }
 
@@ -100,7 +106,12 @@ public class MessageGenerator extends AbstractIdleService {
         int size = jobMessageConfigList.size();
 
         messages = new HashMap<>(size);
+
+        //根据百分比进行分类
         calDistribution();
+
+        //缓存数据
+        generateData();
     }
 
     @Override

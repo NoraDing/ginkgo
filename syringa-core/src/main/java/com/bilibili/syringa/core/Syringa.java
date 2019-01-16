@@ -3,15 +3,9 @@
  */
 package com.bilibili.syringa.core;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +15,8 @@ import com.bilibili.syringa.core.job.MessageGenerator;
 import com.bilibili.syringa.core.statistics.ResultManager;
 import com.bilibili.syringa.core.statistics.RunResult;
 import com.bilibili.syringa.core.util.ThreadPoolExecutorFactory;
-
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.AsyncEventBus;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.Service;
-import com.google.common.util.concurrent.ServiceManager;
 
 /**
  * @author dingsainan
@@ -50,13 +40,14 @@ public class Syringa {
             syringaContext.setOptionInit(optionInit);
 
             //2.初始化消费发送器
-            MessageGenerator messageGenerator = new MessageGenerator(syringaContext
-                .getSyringaSystemConfig().getJobMessageConfigList());
+            MessageGenerator messageGenerator = new MessageGenerator(
+                syringaContext.getSyringaSystemConfig().getJobMessageConfigList());
             syringaContext.setMessageGenerator(messageGenerator);
             messageGenerator.startAsync().awaitRunning();
 
             //3.启动作业管理
-            JobManager jobManager = new JobManager(syringaContext.getSyringaSystemConfig());
+            JobManager jobManager = new JobManager(syringaContext.getSyringaSystemConfig(),
+                syringaContext.getMessageGenerator());
 
             jobManager.startAsync().awaitRunning();
             List<Future<RunResult>> futureResults = jobManager.run();

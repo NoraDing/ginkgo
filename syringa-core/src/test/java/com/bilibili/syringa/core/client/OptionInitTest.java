@@ -50,4 +50,14 @@ public class OptionInitTest extends BaseTest {
         LOGGER.info("the value is {}", aLong3);
 
     }
+
+    @Test
+    public void readFileTest() {
+        String[] args = new String[] { "" };
+
+        OptionInit optionInit = new OptionInit(args);
+        optionInit
+            .generateProperties("/Users/dingsainan/soft/kafka-0.10/config/producer.properties");
+
+    }
 }

@@ -3,6 +3,10 @@
  */
 package com.bilibili.syringa.core.client;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.SyringaContext;
 import com.bilibili.syringa.core.config.SyringaSystemConfig;
+import com.bilibili.syringa.core.enums.ConfigEnums;
 import com.bilibili.syringa.core.enums.TypeEnums;
 import com.bilibili.syringa.core.job.JobMessageConfig;
+import com.bilibili.syringa.core.properties.Properties;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -58,6 +65,7 @@ public class OptionInit extends AbstractIdleService {
             String size = cli.getOptionValue("size");//请求大小分布  
             String topics = cli.getOptionValue("topics");//请求的主题
             String servers = cli.getOptionValue("bootstrap.servers");//请求的kafka地址
+            String configPath = cli.getOptionValue("configPath");//生产者的参数配置
 
             Preconditions.checkNotNull(type, "type is null");
             Preconditions.checkNotNull(messages, "messages is null");
@@ -86,12 +94,81 @@ public class OptionInit extends AbstractIdleService {
             //6.kafka地址
             syringaSystemConfig.setServers(servers);
 
+            //7.configPath
+            if (configPath != null) {
+
+                //根据路径读取文件
+                List<Properties> properties = generateProperties(configPath);
+                if (CollectionUtils.isNotEmpty(properties)) {
+                    syringaSystemConfig.setProperties(properties);
+                }
+            }
+
             SyringaContext.getInstance().setSyringaSystemConfig(syringaSystemConfig);
         } catch (Exception e) {
             LOGGER.error("init args error", e);
             System.exit(-1);
         }
 
+    }
+
+    @VisibleForTesting
+    public List<Properties> generateProperties(String fileName) {
+
+        List<String> contents = readFile(fileName);
+
+        List<Properties> properties = new ArrayList<>();
+
+        for (String content : contents) {
+            List<String> strings = EQUAL_SPLITTER.splitToList(content);
+            String name = strings.get(0);
+            String value = strings.get(1);
+            boolean validConfig = ConfigEnums.validConfig(name);
+            if (!validConfig) {
+                continue;
+            }
+            properties.add(new Properties(name, value));
+        }
+
+        LOGGER.info("the properties is {}", properties);
+
+        return properties;
+
+    }
+
+    @VisibleForTesting
+    public List<String> readFile(String fileName) {
+
+        List<String> contents = new ArrayList<>();
+        File file = new File(fileName);
+        BufferedReader reader = null;
+
+        try {
+            reader = new BufferedReader(new FileReader(file));
+
+            String tempString = null;
+            while ((tempString = reader.readLine()) != null) {
+                if (tempString.startsWith("#") || !tempString.contains("=")) {
+                    continue;
+                }
+                contents.add(tempString);
+            }
+
+            LOGGER.info("the contents are {}", contents);
+
+        } catch (Exception e) {
+            LOGGER.error("read the file error", e);
+
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                LOGGER.error("close the file failed", e);
+            }
+
+        }
+
+        return contents;
     }
 
     private void sizeCheck(String size) {
@@ -127,7 +204,7 @@ public class OptionInit extends AbstractIdleService {
         syringaSystemConfig.setJobMessageConfigList(jobMessageConfigs);
     }
 
-    //for test
+    @VisibleForTesting
     public Long parseMessageSizeStr(String messageSizeStr) {
         int b = messageSizeStr.indexOf("b");
         int k = messageSizeStr.indexOf("k");
@@ -192,7 +269,8 @@ public class OptionInit extends AbstractIdleService {
         options.addOption("c", "concurrency", true, "sender concurrency");
         options.addOption("s", "size", true, "message size");
         options.addOption("ts", "topics", true, "number of the topic ");
-        options.addOption("bs", "bootstrap.servers", true, "number of the topic ");
+        options.addOption("bs", "bootstrap.servers", true, "bootstrap server  ");
+        options.addOption("p", "configPath", true, "config file");
 
         return options;
     }

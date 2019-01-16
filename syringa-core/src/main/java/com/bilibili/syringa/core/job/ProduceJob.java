@@ -3,25 +3,16 @@
  */
 package com.bilibili.syringa.core.job;
 
-import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-
-import com.bilibili.syringa.core.config.SyringaSystemConfig;
-import com.bilibili.syringa.core.job.task.JobTask;
-import com.bilibili.syringa.core.producer.ProducerWrapper;
-import com.bilibili.syringa.core.producer.ProducerWrapperBuilder;
-import com.bilibili.syringa.core.statistics.RunResult;
-import com.bilibili.syringa.core.statistics.TaskEvent;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Future;
+
+import com.bilibili.syringa.core.job.task.ProducerJobTask;
+import com.bilibili.syringa.core.producer.ProducerWrapper;
+import com.bilibili.syringa.core.producer.ProducerWrapperBuilder;
+import com.bilibili.syringa.core.properties.Properties;
+import com.bilibili.syringa.core.statistics.RunResult;
 
 /**
  *
@@ -30,42 +21,42 @@ import java.util.concurrent.Future;
  */
 public class ProduceJob extends AbstractJob {
 
-    public ProduceJob(String name, long messageCounter) {
-        super(name, messageCounter);
+    public ProduceJob(String name, long messageCounter, MessageGenerator messageGenerator,
+                      List<Properties> properties) {
+        super(name, messageCounter, messageGenerator, properties);
     }
 
     @Override
     public RunResult call() throws Exception {
 
-        Collection<JobTask> jobTasks = new ArrayList<>(topicList.size());
-        for (String topic : topicList) {
-            ProducerWrapper instance = ProducerWrapperBuilder.instance(
-                syringaSystemConfig.getServers(), topic);
-            JobTask jobTask = new JobTask(instance, messageCounter);
+        RunResult runResult = new RunResult();
 
-            ((ArrayList<JobTask>) jobTasks).add(jobTask);
+        Collection<ProducerJobTask> producerJobTasks = new ArrayList<>(topicList.size());
+        for (String topic : topicList) {
+            ProducerWrapper instance = ProducerWrapperBuilder.instance(topic, messageGenerator,
+                properties);
+            ProducerJobTask producerJobTask = new ProducerJobTask(instance, messageCounter);
+
+            ((ArrayList<ProducerJobTask>) producerJobTasks).add(producerJobTask);
         }
 
-        List<Future<RunResult>> futures = listeningExecutorService.invokeAll(jobTasks);
-
-        //        for (Future<RunResult> future : futures) {
-        //            Futures.addCallback(future, new FutureCallback<V>() {
-        //                @Override
-        //                public void onSuccess(@Nullable V result) {
+        List<Future<RunResult>> futures = listeningExecutorService.invokeAll(producerJobTasks);
         //
-        //                    //
-        //                    TaskEvent success = new TaskEvent();
-        //                    asyncEventBus.post(success);
+        //        for (Future<RunResult> future : futures) {
+        //            Futures.addCallback(future, new FutureCallback<RunResult>() {
+        //
+        //                @Override
+        //                public void onSuccess(@Nullable RunResult result) {
+        //
         //                }
         //
         //                @Override
         //                public void onFailure(Throwable t) {
-        //                    TaskEvent failed = new TaskEvent();
-        //                    asyncEventBus.post(failed);
+        //
         //                }
         //            });
         //        }
 
-        return new RunResult();
+        return runResult;
     }
 }

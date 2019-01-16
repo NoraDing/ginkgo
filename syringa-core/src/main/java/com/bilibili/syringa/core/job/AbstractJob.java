@@ -3,23 +3,18 @@
  */
 package com.bilibili.syringa.core.job;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.bilibili.syringa.core.SyringaContext;
+import com.bilibili.syringa.core.config.SyringaSystemConfig;
+import com.bilibili.syringa.core.properties.Properties;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-
-import com.bilibili.syringa.core.SyringaConfig;
-import com.bilibili.syringa.core.SyringaContext;
-import com.bilibili.syringa.core.config.SyringaSystemConfig;
-import com.bilibili.syringa.core.util.ThreadPoolExecutorFactory;
-
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  *
@@ -42,9 +37,15 @@ public abstract class AbstractJob extends AbstractIdleService implements Job {
 
     protected AsyncEventBus            asyncEventBus;
 
-    public AbstractJob(String name, long messageCounter) {
+    protected MessageGenerator         messageGenerator;
+    protected List<Properties>         properties;
+
+    public AbstractJob(String name, long messageCounter, MessageGenerator messageGenerator,
+                       List<Properties> properties) {
         this.name = name;
         this.messageCounter = messageCounter;
+        this.messageGenerator = messageGenerator;
+        this.properties = properties;
 
     }
 
@@ -54,6 +55,8 @@ public abstract class AbstractJob extends AbstractIdleService implements Job {
         listeningExecutorService = MoreExecutors.newDirectExecutorService();
         this.topicList = SyringaContext.getInstance().getSyringaSystemConfig().getTopicList();
         this.asyncEventBus = SyringaContext.getInstance().getAsyncEventBus();
+        this.messageGenerator = SyringaContext.getInstance().getMessageGenerator();
+        this.properties = SyringaContext.getInstance().getSyringaSystemConfig().getProperties();
 
         LOGGER.info("init executor success !");
     }

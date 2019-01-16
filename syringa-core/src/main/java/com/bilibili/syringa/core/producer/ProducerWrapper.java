@@ -3,9 +3,17 @@
  */
 package com.bilibili.syringa.core.producer;
 
-import java.util.Properties;
+import java.time.LocalDateTime;
 
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.bilibili.syringa.core.job.MessageGenerator;
+import com.bilibili.syringa.core.statistics.RunResult;
 
 /**
  * @author dingsainan
@@ -13,14 +21,44 @@ import org.apache.kafka.clients.producer.KafkaProducer;
  */
 public class ProducerWrapper {
 
-    private KafkaProducer kafkaProducer;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProducerWrapper.class);
 
-    private String        topic;
+    private KafkaProducer       kafkaProducer;
 
-    public ProducerWrapper(KafkaProducer kafkaProducer, String topic) {
+    private String              topic;
+
+    private MessageGenerator    messageGenerator;
+
+    public ProducerWrapper(KafkaProducer kafkaProducer, String topic,
+                           MessageGenerator messageGenerator) {
         this.kafkaProducer = kafkaProducer;
         this.topic = topic;
+        this.messageGenerator = messageGenerator;
 
     }
 
+    public void sendMessage(RunResult runResult) {
+
+        //起始时间
+        LocalDateTime startDate = runResult.getStartDate();
+        if (startDate == null) {
+            runResult.setStartDate(LocalDateTime.now());
+        }
+
+        long sizePer = runResult.getSizePer();
+        byte[] messageBytes = messageGenerator.getMessage();
+        int size = messageBytes.length;
+        runResult.setSizePer(sizePer + size);
+
+        String message = new String(messageBytes);
+
+        kafkaProducer.send(new ProducerRecord<String, String>(topic, message), new Callback() {
+            @Override
+            public void onCompletion(RecordMetadata metadata, Exception exception) {
+                LOGGER.info("the complete date is {}", LocalDateTime.now());
+                runResult.setFinishDate(LocalDateTime.now());
+            }
+        });
+
+    }
 }

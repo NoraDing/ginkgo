@@ -42,9 +42,6 @@ public class MessageGeneratorTest extends BaseTest {
         jobMessageConfigList.add(jobMessageConfig2);
         jobMessageConfigList.add(jobMessageConfig3);
         jobMessageConfigList.add(jobMessageConfig4);
-        MessageGenerator messageGenerator = new MessageGenerator();
-        messageGenerator.setJobMessageConfigList(jobMessageConfigList);
-        messageGenerator.build().getMessage();
 
 
     }

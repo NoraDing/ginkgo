@@ -3,6 +3,8 @@
  */
 package com.bilibili.syringa.core.statistics;
 
+import java.time.LocalDateTime;
+
 /**
  *
  * @author xuezhaoming
@@ -10,4 +12,49 @@ package com.bilibili.syringa.core.statistics;
  */
 public class RunResult {
 
+    private boolean       success;
+    private LocalDateTime startDate;
+    private LocalDateTime finishDate;
+    private long          sizePer;
+    private long          message;
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDateTime getFinishDate() {
+        return finishDate;
+    }
+
+    public void setFinishDate(LocalDateTime finishDate) {
+        this.finishDate = finishDate;
+    }
+
+    public long getSizePer() {
+        return sizePer;
+    }
+
+    public void setSizePer(long sizePer) {
+        this.sizePer = sizePer;
+    }
+
+    public long getMessage() {
+        return message;
+    }
+
+    public void setMessage(long message) {
+        this.message = message;
+    }
 }
