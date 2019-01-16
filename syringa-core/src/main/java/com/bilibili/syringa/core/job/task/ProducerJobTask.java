@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bilibili.syringa.core.enums.TypeEnums;
 import com.bilibili.syringa.core.producer.ProducerWrapper;
 import com.bilibili.syringa.core.statistics.RunResult;
 
@@ -37,21 +38,24 @@ public class ProducerJobTask implements Callable<RunResult> {
     public RunResult call() throws Exception {
 
         RunResult runResult = new RunResult();
+        runResult.setTypeEnums(TypeEnums.PRODUCER);
+
         for (int i = 0; i < messageCounter; i++) {
             producerWrapper.sendMessage(runResult);
         }
+        runResult.setSuccess(true);
 
         //直接输出结果
-        long message = runResult.getMessage();
-        long sizePer = runResult.getSizePer();
-        long totalSize= BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(sizePer))
-            .divide(BigDecimal.valueOf(SCALE)).divide(BigDecimal.valueOf(SCALE)).longValue();
-
-        LocalDateTime startDate = runResult.getStartDate();
-        LocalDateTime finishDate = runResult.getFinishDate();
-        long duration = Duration.between(startDate, finishDate).getSeconds();
-        LOGGER.info("{},{},{}, {}, {}, {}", totalSize, totalSize / duration, message,
-            message / duration);
+//        long message = runResult.getMessage();
+//        long sizePer = runResult.getSizePer();
+//        long totalSize = BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(sizePer))
+//            .divide(BigDecimal.valueOf(SCALE)).divide(BigDecimal.valueOf(SCALE)).longValue();
+//
+//        LocalDateTime startDate = runResult.getStartDate();
+//        LocalDateTime finishDate = runResult.getFinishDate();
+//        long duration = Duration.between(startDate, finishDate).getSeconds();
+//        LOGGER.info("{},{},{}, {}, {}, {}", totalSize, totalSize / duration, message,
+//            message / duration);
 
         return runResult;
     }

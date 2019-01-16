@@ -7,13 +7,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.config.SyringaSystemConfig;
-import com.bilibili.syringa.core.properties.Properties;
 import com.bilibili.syringa.core.statistics.RunResult;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -36,6 +36,8 @@ public class JobManager extends AbstractIdleService {
 
     private Collection<Job>          runJob = new ArrayList<>();
 
+    private List<Future<RunResult>>  futures;
+
     public JobManager(SyringaSystemConfig syringaSystemConfig, MessageGenerator messageGenerator) {
         this.syringaSystemConfig = syringaSystemConfig;
         this.messageGenerator = messageGenerator;
@@ -51,7 +53,7 @@ public class JobManager extends AbstractIdleService {
         //转配成作业的配置
         long messages = syringaSystemConfig.getMessages();
         int concurrency = syringaSystemConfig.getConcurrency();
-        List<Properties> properties = syringaSystemConfig.getProperties();
+        Properties properties = syringaSystemConfig.getProperties();
         long threadMessage = new BigDecimal(messages).divide(new BigDecimal(concurrency))
             .longValue();
 
@@ -61,10 +63,14 @@ public class JobManager extends AbstractIdleService {
                 case CONSUMER:
                     job = new ConsumerJob("consumer-job-" + j, threadMessage, messageGenerator,
                         properties);
+                    futures.addAll(((ConsumerJob) job).getFutures());
+
                     break;
                 case PRODUCER:
                     job = new ProduceJob("producer-job-" + j, threadMessage, messageGenerator,
                         properties);
+                    futures.addAll(((ProduceJob) job).getFutures());
+
                     break;
                 default:
 
@@ -77,7 +83,8 @@ public class JobManager extends AbstractIdleService {
 
     public List<Future<RunResult>> run() throws InterruptedException {
 
-        return listeningExecutorService.invokeAll(runJob);
+        futures.addAll(listeningExecutorService.invokeAll(runJob));
+        return futures;
 
     }
 

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.consumer.ConsumerWrapper;
+import com.bilibili.syringa.core.enums.TypeEnums;
 import com.bilibili.syringa.core.statistics.RunResult;
 
 /**
@@ -36,10 +37,12 @@ public class ConsumerJobTask implements Callable<RunResult> {
     @Override
     public RunResult call() throws Exception {
         RunResult runResult = new RunResult();
+        runResult.setTypeEnums(TypeEnums.CONSUMER);
         runResult.setMessage(messageCounter);
         for (int i = 0; i < messageCounter; i++) {
             consumerWrapper.pollMessage(runResult);
         }
+        runResult.setSuccess(true);
 
         //直接输出结果
         LocalDateTime startDate = runResult.getStartDate();

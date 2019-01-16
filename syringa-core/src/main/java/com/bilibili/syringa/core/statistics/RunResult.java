@@ -5,6 +5,8 @@ package com.bilibili.syringa.core.statistics;
 
 import java.time.LocalDateTime;
 
+import com.bilibili.syringa.core.enums.TypeEnums;
+
 /**
  *
  * @author xuezhaoming
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 public class RunResult {
 
     private boolean       success;
+    private TypeEnums     typeEnums;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
     private long          sizePer;
@@ -25,6 +28,14 @@ public class RunResult {
 
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+    public TypeEnums getTypeEnums() {
+        return typeEnums;
+    }
+
+    public void setTypeEnums(TypeEnums typeEnums) {
+        this.typeEnums = typeEnums;
     }
 
     public LocalDateTime getStartDate() {
@@ -65,5 +76,12 @@ public class RunResult {
 
     public void setTotalSize(long totalSize) {
         this.totalSize = totalSize;
+    }
+
+    @Override
+    public String toString() {
+        return "RunResult{" + "success=" + success + ", typeEnums=" + typeEnums + ", startDate="
+               + startDate + ", finishDate=" + finishDate + ", sizePer=" + sizePer + ", message="
+               + message + ", totalSize=" + totalSize + '}';
     }
 }

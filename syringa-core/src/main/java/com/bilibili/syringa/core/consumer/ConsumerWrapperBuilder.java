@@ -3,12 +3,9 @@
  */
 package com.bilibili.syringa.core.consumer;
 
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-
-import com.bilibili.syringa.core.enums.ConfigEnums;
 
 /**
  *
@@ -24,32 +21,23 @@ public class ConsumerWrapperBuilder {
      * @return
      */
     public static ConsumerWrapper instance(String servers, String topic, String groupId,
-                                           List<com.bilibili.syringa.core.properties.Properties> propertiesList) {
+                                           Properties properties) {
 
-        Properties properties = new Properties();
-        generateDefaultPro(properties);
-
-        Properties props = new Properties();
-        for (com.bilibili.syringa.core.properties.Properties userProperty : propertiesList) {
-
-            props.put(userProperty.getName(), userProperty.getValue());
-
-        }
         KafkaConsumer kafkaConsumer = new KafkaConsumer<>(properties);
 
         return new ConsumerWrapper(kafkaConsumer, topic);
     }
 
-    private static void generateDefaultPro(Properties props) {
-        props.put(ConfigEnums.ACKS_CONFIG, "all");
-        props.put(ConfigEnums.GROUP_ID_CONFIG, "consumer_group_id");
-        props.put(ConfigEnums.ENABLE_AUTO_COMMIT_CONFIG, true);
-        props.put(ConfigEnums.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
-        props.put(ConfigEnums.KEY_SERIALIZER_CLASS_CONFIG,
-            "org.apache.kafka.common.serialization.StringSerializer");
-        props.put(ConfigEnums.VALUE_SERIALIZER_CLASS_CONFIG,
-            "org.apache.kafka.common.serialization.StringSerializer");
-
-    }
+    //    private static void generateDefaultPro(Properties props) {
+    //        props.put(ConfigEnums.ACKS_CONFIG, "all");
+    //        props.put(ConfigEnums.GROUP_ID_CONFIG, "consumer_group_id");
+    //        props.put(ConfigEnums.ENABLE_AUTO_COMMIT_CONFIG, true);
+    //        props.put(ConfigEnums.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
+    //        props.put(ConfigEnums.KEY_SERIALIZER_CLASS_CONFIG,
+    //            "org.apache.kafka.common.serialization.StringSerializer");
+    //        props.put(ConfigEnums.VALUE_SERIALIZER_CLASS_CONFIG,
+    //            "org.apache.kafka.common.serialization.StringSerializer");
+    //
+    //    }
 
 }

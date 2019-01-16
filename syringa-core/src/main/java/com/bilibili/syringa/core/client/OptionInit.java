@@ -3,12 +3,13 @@
  */
 package com.bilibili.syringa.core.client;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -23,7 +24,6 @@ import com.bilibili.syringa.core.config.SyringaSystemConfig;
 import com.bilibili.syringa.core.enums.ConfigEnums;
 import com.bilibili.syringa.core.enums.TypeEnums;
 import com.bilibili.syringa.core.job.JobMessageConfig;
-import com.bilibili.syringa.core.properties.Properties;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -97,11 +97,9 @@ public class OptionInit extends AbstractIdleService {
             //7.configPath
             if (configPath != null) {
 
-                //根据路径读取文件
-                List<Properties> properties = generateProperties(configPath);
-                if (CollectionUtils.isNotEmpty(properties)) {
-                    syringaSystemConfig.setProperties(properties);
-                }
+                //根据文件路径读取文件，生成properties
+                Properties properties = generateProperties(configPath);
+                syringaSystemConfig.setProperties(properties);
             }
 
             SyringaContext.getInstance().setSyringaSystemConfig(syringaSystemConfig);
@@ -113,62 +111,33 @@ public class OptionInit extends AbstractIdleService {
     }
 
     @VisibleForTesting
-    public List<Properties> generateProperties(String fileName) {
+    public Properties generateProperties(String fileName) {
 
-        List<String> contents = readFile(fileName);
+        Properties properties = new Properties();
 
-        List<Properties> properties = new ArrayList<>();
+        try {
+            List<String> contents = Files.readAllLines(Paths.get(URI.create(fileName)));
+            for (String content : contents) {
+                if (content == null || content.startsWith("#") || !content.contains("=")) {
+                    continue;
+                }
+                List<String> strings = EQUAL_SPLITTER.splitToList(content.trim());
+                String name = strings.get(0);
+                String value = strings.get(1);
+                boolean validConfig = ConfigEnums.validConfig(name);
+                if (!validConfig) {
+                    continue;
+                }
 
-        for (String content : contents) {
-            List<String> strings = EQUAL_SPLITTER.splitToList(content);
-            String name = strings.get(0);
-            String value = strings.get(1);
-            boolean validConfig = ConfigEnums.validConfig(name);
-            if (!validConfig) {
-                continue;
+                properties.put(name, value);
             }
-            properties.add(new Properties(name, value));
-        }
 
-        LOGGER.info("the properties is {}", properties);
+        } catch (IOException e) {
+            LOGGER.info("read the file error", e);
+        }
 
         return properties;
 
-    }
-
-    @VisibleForTesting
-    public List<String> readFile(String fileName) {
-
-        List<String> contents = new ArrayList<>();
-        File file = new File(fileName);
-        BufferedReader reader = null;
-
-        try {
-            reader = new BufferedReader(new FileReader(file));
-
-            String tempString = null;
-            while ((tempString = reader.readLine()) != null) {
-                if (tempString.startsWith("#") || !tempString.contains("=")) {
-                    continue;
-                }
-                contents.add(tempString);
-            }
-
-            LOGGER.info("the contents are {}", contents);
-
-        } catch (Exception e) {
-            LOGGER.error("read the file error", e);
-
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                LOGGER.error("close the file failed", e);
-            }
-
-        }
-
-        return contents;
     }
 
     private void sizeCheck(String size) {

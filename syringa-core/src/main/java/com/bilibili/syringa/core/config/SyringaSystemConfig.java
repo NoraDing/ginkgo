@@ -4,10 +4,10 @@
 package com.bilibili.syringa.core.config;
 
 import java.util.List;
+import java.util.Properties;
 
 import com.bilibili.syringa.core.enums.TypeEnums;
 import com.bilibili.syringa.core.job.JobMessageConfig;
-import com.bilibili.syringa.core.properties.Properties;
 
 /**
  * @author dingsainan
@@ -22,7 +22,7 @@ public class SyringaSystemConfig {
     private List<JobMessageConfig> jobMessageConfigList;
     private List<String>           topicList;
     private String                 servers;
-    private List<Properties>       properties;
+    private Properties             properties;
 
     public TypeEnums getType() {
         return type;
@@ -80,11 +80,11 @@ public class SyringaSystemConfig {
         this.servers = servers;
     }
 
-    public List<Properties> getProperties() {
+    public Properties getProperties() {
         return properties;
     }
 
-    public void setProperties(List<Properties> properties) {
+    public void setProperties(Properties properties) {
         this.properties = properties;
     }
 

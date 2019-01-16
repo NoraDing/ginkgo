@@ -6,6 +6,7 @@ package com.bilibili.syringa.core.job;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.bilibili.syringa.core.consumer.ConsumerWrapper;
 import com.bilibili.syringa.core.consumer.ConsumerWrapperBuilder;
 import com.bilibili.syringa.core.job.task.ConsumerJobTask;
-import com.bilibili.syringa.core.properties.Properties;
 import com.bilibili.syringa.core.statistics.RunResult;
 
 /**
@@ -22,10 +22,16 @@ import com.bilibili.syringa.core.statistics.RunResult;
  * @version $Id: ConsumerJob.java, v 0.1 2019-01-15 2:32 PM Exp $$
  */
 public class ConsumerJob extends AbstractJob {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerJob.class);
+    private static final Logger     LOGGER = LoggerFactory.getLogger(ConsumerJob.class);
+
+    private List<Future<RunResult>> futures;
+
+    public List<Future<RunResult>> getFutures() {
+        return futures;
+    }
 
     public ConsumerJob(String name, long messageCounter, MessageGenerator messageGenerator,
-                       List<Properties> properties) {
+                       Properties properties) {
         super(name, messageCounter, messageGenerator, properties);
     }
 
@@ -46,7 +52,7 @@ public class ConsumerJob extends AbstractJob {
 
         }
 
-        List<Future<RunResult>> futures = listeningExecutorService.invokeAll(consumerJobTasks);
+        futures = listeningExecutorService.invokeAll(consumerJobTasks);
 
         return null;
     }

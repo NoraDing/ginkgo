@@ -4,13 +4,13 @@
 package com.bilibili.syringa.core.job;
 
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.SyringaContext;
 import com.bilibili.syringa.core.config.SyringaSystemConfig;
-import com.bilibili.syringa.core.properties.Properties;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -38,10 +38,10 @@ public abstract class AbstractJob extends AbstractIdleService implements Job {
     protected AsyncEventBus            asyncEventBus;
 
     protected MessageGenerator         messageGenerator;
-    protected List<Properties>         properties;
+    protected Properties               properties;
 
     public AbstractJob(String name, long messageCounter, MessageGenerator messageGenerator,
-                       List<Properties> properties) {
+                       Properties properties) {
         this.name = name;
         this.messageCounter = messageCounter;
         this.messageGenerator = messageGenerator;
