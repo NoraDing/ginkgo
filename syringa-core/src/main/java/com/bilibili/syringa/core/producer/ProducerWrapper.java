@@ -61,7 +61,6 @@ public class ProducerWrapper {
         kafkaProducer.send(new ProducerRecord<String, String>(topic, message), new Callback() {
             @Override
             public void onCompletion(RecordMetadata metadata, Exception exception) {
-//                LOGGER.info("the complete date is {}", LocalDateTime.now());
                 runResult.setFinishDate(LocalDateTime.now());
             }
         });

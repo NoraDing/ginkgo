@@ -3,7 +3,6 @@
  */
 package com.bilibili.syringa.core.job.task;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -42,27 +41,11 @@ public class ProducerJobTask implements Callable<RunResult> {
         runResult.setTypeEnums(TypeEnums.PRODUCER);
         runResult.setMessage(messageCounter);
 
-        LOGGER.info("the ProducerJobTask is here {} ", runResult.toString());
-
         for (int i = 0; i < messageCounter; i++) {
             producerWrapper.sendMessage(runResult);
         }
 
-        runResult.setFinishDate(LocalDateTime.now());
-
         runResult.setSuccess(true);
-
-        //直接输出结果
-        //        long message = runResult.getMessage();
-        //        long sizePer = runResult.getSizePer();
-        //        long totalSize = BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(sizePer))
-        //            .divide(BigDecimal.valueOf(SCALE)).divide(BigDecimal.valueOf(SCALE)).longValue();
-        //
-        //        LocalDateTime startDate = runResult.getStartDate();
-        //        LocalDateTime finishDate = runResult.getFinishDate();
-        //        long duration = Duration.between(startDate, finishDate).getSeconds();
-        //        LOGGER.info("{},{},{}, {}, {}, {}", totalSize, totalSize / duration, message,
-        //            message / duration);
 
         return runResult;
     }
