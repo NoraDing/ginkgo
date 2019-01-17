@@ -4,9 +4,7 @@
  */
 package com.bilibili.syringa.core.job.task;
 
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -28,8 +26,10 @@ public class ConsumerJobTask implements Callable<RunResult> {
 
     private ConsumerWrapper     consumerWrapper;
     private long                messageCounter;
+    private String              topic;
 
-    public ConsumerJobTask(ConsumerWrapper consumerWrapper, long messageCounter) {
+    public ConsumerJobTask(String topic, ConsumerWrapper consumerWrapper, long messageCounter) {
+        this.topic = topic;
         this.consumerWrapper = consumerWrapper;
         this.messageCounter = messageCounter;
     }
@@ -37,26 +37,16 @@ public class ConsumerJobTask implements Callable<RunResult> {
     @Override
     public RunResult call() throws Exception {
         RunResult runResult = new RunResult();
+
+        runResult.setTopicName(topic);
         runResult.setTypeEnums(TypeEnums.CONSUMER);
         runResult.setMessage(messageCounter);
+        consumerWrapper.getKafkaConsumer().subscribe(Collections.singleton(topic));
+
         for (int i = 0; i < messageCounter; i++) {
             consumerWrapper.pollMessage(runResult);
         }
         runResult.setSuccess(true);
-
-        //直接输出结果
-        LocalDateTime startDate = runResult.getStartDate();
-        LocalDateTime finishDate = runResult.getFinishDate();
-        long message = runResult.getMessage();
-        long totalSize = runResult.getTotalSize();
-        long duration = Duration.between(startDate, finishDate).getSeconds();
-
-        double MBSec = BigDecimal.valueOf(totalSize).divide(BigDecimal.valueOf(SCALE))
-            .divide(BigDecimal.valueOf(SCALE)).divide(BigDecimal.valueOf(duration)).doubleValue();
-        double nMsgSec = BigDecimal.valueOf(totalSize).divide(BigDecimal.valueOf(duration))
-            .doubleValue();
-
-        LOGGER.info("{},{},{},{}", startDate, finishDate, totalSize, MBSec, message, nMsgSec);
 
         return runResult;
     }

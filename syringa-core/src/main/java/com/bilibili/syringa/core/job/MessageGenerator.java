@@ -44,8 +44,7 @@ public class MessageGenerator extends AbstractIdleService {
      */
     public byte[] getMessage() {
 
-        int nextRandom = ThreadLocalRandom.current().nextInt(100);
-        LOGGER.info("the nextRandom is {}", nextRandom);
+        int nextRandom = ThreadLocalRandom.current().nextInt(1,100);
         byte[] locateValue = locate(nextRandom);
         return locateValue;
     }

@@ -10,79 +10,114 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.AbstractIdleService;
-
 /**
- *
  * @author xuezhaoming
  * @version $Id: ResultManager.java, v 0.1 2019-01-15 3:35 PM Exp $$
  */
-public class ResultManager extends AbstractIdleService {
+public class ResultManager {
 
-    private static final Logger     LOGGER = LoggerFactory.getLogger(ResultManager.class);
-    private static final int        SCALE  = 1024;
+    private static final Logger           LOGGER = LoggerFactory.getLogger(ResultManager.class);
+    private static final int              SCALE  = 1024;
+    private List<StatisticsInfo>          statisticsInfos;
+    private List<Future<List<RunResult>>> futureList;
 
-    private List<Future<RunResult>> futureList;
-
-    public ResultManager(List<Future<RunResult>> futureList) {
+    public ResultManager(List<Future<List<RunResult>>> futureList) {
         this.futureList = futureList;
     }
 
-    @Override
-    protected void startUp() throws Exception {
+    public void startUp() throws Exception {
 
         LOGGER.info("start.time, end.time,total.data.sent.in.MB, MB.sec, "
                     + "total.data.sent.in.nMsg, nMsg.sec");
 
-        List<StatisticsInfo> statisticsInfos = new ArrayList<>();
-        for (Future<RunResult> runResultFuture : futureList) {
+        statisticsInfos = new ArrayList<>();
+        for (Future<List<RunResult>> runResultFuture : futureList) {
             StatisticsInfo statisticsInfo = new StatisticsInfo();
-            RunResult runResult = runResultFuture.get();
+            boolean cancelled = runResultFuture.isCancelled();
+            List<RunResult> runResults = runResultFuture.get();
 
-            boolean success = runResult.isSuccess();
-            if (!success) {
-                continue;
+            for (RunResult runResult : runResults) {
+
+                boolean success = runResult.isSuccess();
+                if (!success) {
+                    continue;
+                }
+
+                double message = runResult.getMessage();
+                double sizePer = runResult.getSizePer();
+                double totalSize = BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(sizePer))
+                    .divide(BigDecimal.valueOf(SCALE), 5, BigDecimal.ROUND_HALF_UP)
+                    .divide(BigDecimal.valueOf(SCALE), 5, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+                LocalDateTime startDate = runResult.getStartDate();
+                LocalDateTime finishDate = runResult.getFinishDate();
+                long duration = Duration.between(startDate, finishDate).getSeconds();
+                if (duration == 0) {
+                    LOGGER.warn("no need catch this record");
+                    continue;
+
+                }
+                double mbSec = BigDecimal.valueOf(totalSize)
+                    .divide(BigDecimal.valueOf(duration), 5, BigDecimal.ROUND_HALF_UP)
+                    .doubleValue();
+                double nMessageSec = BigDecimal.valueOf(message)
+                    .divide(BigDecimal.valueOf(duration), 5, BigDecimal.ROUND_HALF_UP)
+                    .doubleValue();
+                statisticsInfo.setStartDate(startDate);
+                statisticsInfo.setFinishDate(finishDate);
+                statisticsInfo.setMessage(message);
+                statisticsInfo.setTotalSize(totalSize);
+                statisticsInfo.setMbSecs(totalSize);
+                statisticsInfo.setMbSecs(mbSec);
+                statisticsInfo.setnMessageSecs(nMessageSec);
+                statisticsInfos.add(statisticsInfo);
+
             }
 
-            long message = runResult.getMessage();
-            long sizePer = runResult.getSizePer();
-            long totalSize = BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(sizePer))
-                .divide(BigDecimal.valueOf(SCALE)).divide(BigDecimal.valueOf(SCALE)).longValue();
-
-            LocalDateTime startDate = runResult.getStartDate();
-            LocalDateTime finishDate = runResult.getFinishDate();
-            long duration = Duration.between(startDate, finishDate).getSeconds();
-            double mbSec = BigDecimal.valueOf(totalSize).divide(BigDecimal.valueOf(duration))
-                .doubleValue();
-            double nMessageSec = BigDecimal.valueOf(message).divide(BigDecimal.valueOf(duration))
-                .doubleValue();
-            statisticsInfo.setStartDate(startDate);
-            statisticsInfo.setFinishDate(finishDate);
-            statisticsInfo.setMessage(message);
-            statisticsInfo.setTotalSize(totalSize);
-            statisticsInfo.setMbSecs(totalSize);
-            statisticsInfo.setMbSecs(mbSec);
-            statisticsInfo.setnMessageSecs(nMessageSec);
-            statisticsInfos.add(statisticsInfo);
         }
 
-        shutDown();
-
     }
 
-    @Override
-    protected void shutDown() throws Exception {
+    public void infoStatistics() {
+        if (CollectionUtils.isEmpty(statisticsInfos)) {
+            LOGGER.info("no info can be found");
+            System.exit(-1);
 
-    }
+        }
 
-    @Subscribe
-    public void listen(TaskEvent event) {
+        StatisticsInfoSummary statisticsInfoSummary = new StatisticsInfoSummary();
 
-        //todo
+        double nMessageMax = statisticsInfos.stream().mapToDouble(StatisticsInfo::getnMessageSecs)
+            .max().getAsDouble();
+
+        double nMessageMin = statisticsInfos.stream().mapToDouble(StatisticsInfo::getnMessageSecs)
+            .min().getAsDouble();
+        double nMessageAverage = statisticsInfos.stream()
+            .mapToDouble(StatisticsInfo::getnMessageSecs).average().getAsDouble();
+
+        double mbMax = statisticsInfos.stream().mapToDouble(StatisticsInfo::getMbSecs).max()
+            .getAsDouble();
+
+        double mbMin = statisticsInfos.stream().mapToDouble(StatisticsInfo::getMbSecs).min()
+            .getAsDouble();
+
+        double mbAverage = statisticsInfos.stream().mapToDouble(StatisticsInfo::getMbSecs).average()
+            .getAsDouble();
+
+        statisticsInfoSummary.setnMessageMax(nMessageMax);
+        statisticsInfoSummary.setnMessageMin(nMessageMin);
+        statisticsInfoSummary.setnMessageAverage(nMessageAverage);
+        statisticsInfoSummary.setMbMax(mbMax);
+        statisticsInfoSummary.setMbMin(mbMin);
+        statisticsInfoSummary.setMbAverage(mbAverage);
+
+        statisticsInfoSummary.setStatisticsInfos(statisticsInfos);
+
+        LOGGER.info("teh value is {}", statisticsInfoSummary.toString());
 
     }
 

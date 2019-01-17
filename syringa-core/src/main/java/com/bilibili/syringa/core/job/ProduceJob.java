@@ -23,39 +23,44 @@ import com.bilibili.syringa.core.statistics.RunResult;
  * @version $Id: ProduceJob.java, v 0.1 2019-01-15 2:29 PM Exp $$
  */
 public class ProduceJob extends AbstractJob {
-    private static final Logger     LOGGER = LoggerFactory.getLogger(ConsumerJob.class);
+    private static final Logger     LOGGER  = LoggerFactory.getLogger(ConsumerJob.class);
 
-    private List<Future<RunResult>> futures=new ArrayList<>();
+    private List<Future<RunResult>> futures = new ArrayList<>();
 
     public List<Future<RunResult>> getFutures() {
         return futures;
     }
 
     public ProduceJob(String name, long messageCounter, MessageGenerator messageGenerator,
-                      Properties properties) {
-        super(name, messageCounter, messageGenerator, properties);
+                      Properties properties, List<String> topicList) {
+        super(name, messageCounter, messageGenerator, properties, topicList);
     }
 
     @Override
-    public RunResult call() throws Exception {
+    public List<RunResult> call() throws Exception {
 
-        RunResult runResult = new RunResult();
+        List<RunResult> runResults = new ArrayList<>();
 
         Collection<ProducerJobTask> producerJobTasks = new ArrayList<>(topicList.size());
-//
-//        LOGGER.info("start.time, end.time,total.data.sent.in.MB, MB.sec, "
-//                    + "total.data.sent.in.nMsg, nMsg.sec");
 
         for (String topic : topicList) {
+
             ProducerWrapper instance = ProducerWrapperBuilder.instance(topic, messageGenerator,
                 properties);
-            ProducerJobTask producerJobTask = new ProducerJobTask(instance, messageCounter);
+            ProducerJobTask producerJobTask = new ProducerJobTask(topic, instance, messageCounter);
 
             ((ArrayList<ProducerJobTask>) producerJobTasks).add(producerJobTask);
         }
 
         futures = listeningExecutorService.invokeAll(producerJobTasks);
 
-        return runResult;
+        //对future进行统计,返回run Result list
+
+        for (Future<RunResult> future : futures) {
+            RunResult runResult = future.get();
+            runResults.add(runResult);
+
+        }
+        return runResults;
     }
 }

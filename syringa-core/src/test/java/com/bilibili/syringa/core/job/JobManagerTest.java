@@ -4,10 +4,13 @@
  */
 package com.bilibili.syringa.core.job;
 
+import java.util.Properties;
+
 import org.junit.Test;
 
 import com.bilibili.syringa.core.SyringaContext;
 import com.bilibili.syringa.core.client.OptionInit;
+import com.bilibili.syringa.core.enums.TypeEnums;
 
 /**
  *
@@ -36,8 +39,14 @@ public class JobManagerTest {
         messageGenerator.startAsync().awaitRunning();
         syringaContext.setMessageGenerator(messageGenerator);
 
-        JobManager jobManager = new JobManager(syringaContext.getSyringaSystemConfig(),
-            messageGenerator);
+        long messages = syringaContext.getSyringaSystemConfig().getMessages();
+        int concurrency = syringaContext.getSyringaSystemConfig().getConcurrency();
+        Properties properties = syringaContext.getSyringaSystemConfig().getProperties();
+        TypeEnums type = syringaContext.getSyringaSystemConfig().getType();
+
+        //3.启动作业管理
+        JobManager jobManager = new JobManager(type, messages, concurrency, null, properties,
+            syringaContext.getMessageGenerator());
         jobManager.startAsync().awaitRunning();
 
     }

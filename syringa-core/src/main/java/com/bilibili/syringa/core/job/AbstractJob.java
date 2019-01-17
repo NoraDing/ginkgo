@@ -41,11 +41,13 @@ public abstract class AbstractJob extends AbstractIdleService implements Job {
     protected Properties               properties;
 
     public AbstractJob(String name, long messageCounter, MessageGenerator messageGenerator,
-                       Properties properties) {
+                       Properties properties, List<String> topicList) {
         this.name = name;
         this.messageCounter = messageCounter;
         this.messageGenerator = messageGenerator;
         this.properties = properties;
+        this.topicList = topicList;
+        listeningExecutorService = MoreExecutors.newDirectExecutorService();
 
     }
 

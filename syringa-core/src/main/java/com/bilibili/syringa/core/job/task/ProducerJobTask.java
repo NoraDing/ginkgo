@@ -3,8 +3,6 @@
  */
 package com.bilibili.syringa.core.job.task;
 
-import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.Callable;
 
@@ -27,9 +25,11 @@ public class ProducerJobTask implements Callable<RunResult> {
 
     private ProducerWrapper     producerWrapper;
     private long                messageCounter;
+    private String              topic;
 
-    public ProducerJobTask(ProducerWrapper producerWrapper, long messageCounter) {
+    public ProducerJobTask(String topic, ProducerWrapper producerWrapper, long messageCounter) {
 
+        this.topic = topic;
         this.messageCounter = messageCounter;
         this.producerWrapper = producerWrapper;
     }
@@ -38,24 +38,31 @@ public class ProducerJobTask implements Callable<RunResult> {
     public RunResult call() throws Exception {
 
         RunResult runResult = new RunResult();
+        runResult.setTopicName(topic);
         runResult.setTypeEnums(TypeEnums.PRODUCER);
+        runResult.setMessage(messageCounter);
+
+        LOGGER.info("the ProducerJobTask is here {} ", runResult.toString());
 
         for (int i = 0; i < messageCounter; i++) {
             producerWrapper.sendMessage(runResult);
         }
+
+        runResult.setFinishDate(LocalDateTime.now());
+
         runResult.setSuccess(true);
 
         //直接输出结果
-//        long message = runResult.getMessage();
-//        long sizePer = runResult.getSizePer();
-//        long totalSize = BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(sizePer))
-//            .divide(BigDecimal.valueOf(SCALE)).divide(BigDecimal.valueOf(SCALE)).longValue();
-//
-//        LocalDateTime startDate = runResult.getStartDate();
-//        LocalDateTime finishDate = runResult.getFinishDate();
-//        long duration = Duration.between(startDate, finishDate).getSeconds();
-//        LOGGER.info("{},{},{}, {}, {}, {}", totalSize, totalSize / duration, message,
-//            message / duration);
+        //        long message = runResult.getMessage();
+        //        long sizePer = runResult.getSizePer();
+        //        long totalSize = BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(sizePer))
+        //            .divide(BigDecimal.valueOf(SCALE)).divide(BigDecimal.valueOf(SCALE)).longValue();
+        //
+        //        LocalDateTime startDate = runResult.getStartDate();
+        //        LocalDateTime finishDate = runResult.getFinishDate();
+        //        long duration = Duration.between(startDate, finishDate).getSeconds();
+        //        LOGGER.info("{},{},{}, {}, {}, {}", totalSize, totalSize / duration, message,
+        //            message / duration);
 
         return runResult;
     }

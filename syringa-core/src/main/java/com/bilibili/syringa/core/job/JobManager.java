@@ -13,7 +13,7 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bilibili.syringa.core.config.SyringaSystemConfig;
+import com.bilibili.syringa.core.enums.TypeEnums;
 import com.bilibili.syringa.core.statistics.RunResult;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -26,20 +26,27 @@ import com.google.common.util.concurrent.MoreExecutors;
  */
 public class JobManager extends AbstractIdleService {
 
-    private static final Logger      LOGGER  = LoggerFactory.getLogger(JobManager.class);
+    private static final Logger      LOGGER = LoggerFactory.getLogger(JobManager.class);
 
-    private SyringaSystemConfig      syringaSystemConfig;
+    private TypeEnums                type;
+    private long                     messages;
+    private int                      concurrency;
+    private List<String>             topicList;
+    private Properties               properties;
 
     private ListeningExecutorService listeningExecutorService;
 
     private MessageGenerator         messageGenerator;
 
-    private Collection<Job>          runJob  = new ArrayList<>();
+    private Collection<Job>          runJob = new ArrayList<>();
 
-    private List<Future<RunResult>>  futures = new ArrayList<>();
-
-    public JobManager(SyringaSystemConfig syringaSystemConfig, MessageGenerator messageGenerator) {
-        this.syringaSystemConfig = syringaSystemConfig;
+    public JobManager(TypeEnums type, long messages, int concurrency, List<String> topicList,
+                      Properties properties, MessageGenerator messageGenerator) {
+        this.type = type;
+        this.messages = messages;
+        this.concurrency = concurrency;
+        this.topicList = topicList;
+        this.properties = properties;
         this.messageGenerator = messageGenerator;
 
         listeningExecutorService = MoreExecutors.newDirectExecutorService();
@@ -48,28 +55,22 @@ public class JobManager extends AbstractIdleService {
     @Override
     protected void startUp() throws Exception {
 
-        LOGGER.info("start to init job manager ");
-
-        //转配成作业的配置
-        long messages = syringaSystemConfig.getMessages();
-        int concurrency = syringaSystemConfig.getConcurrency();
-        Properties properties = syringaSystemConfig.getProperties();
+        //转配成作业的配置 
         long threadMessage = new BigDecimal(messages).divide(new BigDecimal(concurrency))
             .longValue();
 
         for (int j = 0; j < concurrency; j++) {
             Job job = null;
-            switch (syringaSystemConfig.getType()) {
+            switch (type) {
                 case CONSUMER:
                     job = new ConsumerJob("consumer-job-" + j, threadMessage, messageGenerator,
                         properties);
-                    futures.addAll(((ConsumerJob) job).getFutures());
+                    ((ConsumerJob) job).startUp();
 
                     break;
                 case PRODUCER:
                     job = new ProduceJob("producer-job-" + j, threadMessage, messageGenerator,
-                        properties);
-                    futures.addAll(((ProduceJob) job).getFutures());
+                        properties, topicList);
 
                     break;
                 default:
@@ -81,10 +82,9 @@ public class JobManager extends AbstractIdleService {
         }
     }
 
-    public List<Future<RunResult>> run() throws InterruptedException {
+    public List<Future<List<RunResult>>> run() throws InterruptedException {
 
-        futures.addAll(listeningExecutorService.invokeAll(runJob));
-        return futures;
+        return listeningExecutorService.invokeAll(runJob);
 
     }
 

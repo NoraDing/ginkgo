@@ -16,28 +16,20 @@ public class ConsumerWrapperBuilder {
 
     /**
      * 生产者的建造者模式
-     * @param servers kakfa集群地址
      * @param topic
      * @return
      */
-    public static ConsumerWrapper instance(String servers, String topic, String groupId,
-                                           Properties properties) {
+    public static ConsumerWrapper instance(String topic, String groupId, Properties properties) {
+
+        properties.put("group.id", groupId);
+        properties.put("key.deserializer",
+            "org.apache.kafka.common.serialization.StringDeserializer");
+        properties.put("value.deserializer",
+            "org.apache.kafka.common.serialization.StringDeserializer");
 
         KafkaConsumer kafkaConsumer = new KafkaConsumer<>(properties);
 
         return new ConsumerWrapper(kafkaConsumer, topic);
     }
-
-    //    private static void generateDefaultPro(Properties props) {
-    //        props.put(ConfigEnums.ACKS_CONFIG, "all");
-    //        props.put(ConfigEnums.GROUP_ID_CONFIG, "consumer_group_id");
-    //        props.put(ConfigEnums.ENABLE_AUTO_COMMIT_CONFIG, true);
-    //        props.put(ConfigEnums.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
-    //        props.put(ConfigEnums.KEY_SERIALIZER_CLASS_CONFIG,
-    //            "org.apache.kafka.common.serialization.StringSerializer");
-    //        props.put(ConfigEnums.VALUE_SERIALIZER_CLASS_CONFIG,
-    //            "org.apache.kafka.common.serialization.StringSerializer");
-    //
-    //    }
 
 }

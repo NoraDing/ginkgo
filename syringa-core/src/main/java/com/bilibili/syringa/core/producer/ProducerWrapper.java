@@ -45,8 +45,14 @@ public class ProducerWrapper {
             runResult.setStartDate(LocalDateTime.now());
         }
 
-        long sizePer = runResult.getSizePer();
+        double sizePer = runResult.getSizePer();
         byte[] messageBytes = messageGenerator.getMessage();
+
+        if (messageBytes == null) {
+            LOGGER.error("the message byte is null");
+            System.exit(-1);
+
+        }
         int size = messageBytes.length;
         runResult.setSizePer(sizePer + size);
 
@@ -55,7 +61,7 @@ public class ProducerWrapper {
         kafkaProducer.send(new ProducerRecord<String, String>(topic, message), new Callback() {
             @Override
             public void onCompletion(RecordMetadata metadata, Exception exception) {
-                LOGGER.info("the complete date is {}", LocalDateTime.now());
+//                LOGGER.info("the complete date is {}", LocalDateTime.now());
                 runResult.setFinishDate(LocalDateTime.now());
             }
         });

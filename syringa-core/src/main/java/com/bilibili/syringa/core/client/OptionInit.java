@@ -97,7 +97,7 @@ public class OptionInit extends AbstractIdleService {
             if (configPath != null) {
 
                 //根据文件路径读取文件，生成properties
-                Properties properties = generateProperties(configPath);
+                Properties properties = generateProperties(configPath, servers);
                 syringaSystemConfig.setProperties(properties);
             }
             LOGGER.info("the syringaSystemConfig is {}", syringaSystemConfig.toString());
@@ -111,7 +111,7 @@ public class OptionInit extends AbstractIdleService {
     }
 
     @VisibleForTesting
-    public Properties generateProperties(String configPath) {
+    public Properties generateProperties(String configPath, String servers) {
 
         Properties properties = new Properties();
         try {
@@ -136,12 +136,38 @@ public class OptionInit extends AbstractIdleService {
 
                 properties.put(name, value);
             }
+            markUpProperties(properties, servers);
 
         } catch (IOException e) {
             LOGGER.info("read the file error", e);
         }
 
         return properties;
+
+    }
+
+    private void markUpProperties(Properties properties, String servers) {
+        Object o = new Object();
+        o = properties.get(ConfigEnums.BOOTSTRAP_SERVERS_CONFIG.getField());
+        if (o == null) {
+            LOGGER.error("the BOOTSTRAP_SERVERS_CONFIG can not be null");
+            System.exit(-1);
+        }
+        properties.put(ConfigEnums.BOOTSTRAP_SERVERS_CONFIG.getField(), servers);
+
+        o = properties.get(ConfigEnums.KEY_SERIALIZER_CLASS_CONFIG.getField());
+        if (o == null) {
+            properties.put(ConfigEnums.KEY_SERIALIZER_CLASS_CONFIG.getField(),
+                "org.apache.kafka.common.serialization.StringSerializer");
+
+        }
+
+        o = properties.get(ConfigEnums.VALUE_SERIALIZER_CLASS_CONFIG.getField());
+        if (o == null) {
+            properties.put(ConfigEnums.VALUE_SERIALIZER_CLASS_CONFIG.getField(),
+                "org.apache.kafka.common.serialization.StringSerializer");
+
+        }
 
     }
 

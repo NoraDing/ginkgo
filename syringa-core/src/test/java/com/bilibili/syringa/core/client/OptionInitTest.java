@@ -62,7 +62,7 @@ public class OptionInitTest extends BaseTest {
 
         OptionInit optionInit = new OptionInit(args);
         optionInit
-            .generateProperties("/Users/dingsainan/soft/kafka-0.10/config/producer.properties");
+            .generateProperties("/Users/dingsainan/soft/kafka-0.10/config/producer.properties", "");
 
     }
 }

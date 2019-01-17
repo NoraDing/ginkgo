@@ -15,12 +15,13 @@ import com.bilibili.syringa.core.enums.TypeEnums;
 public class RunResult {
 
     private boolean       success;
+    private String        topicName;
     private TypeEnums     typeEnums;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
-    private long          sizePer;
-    private long          message;
-    private long          totalSize;
+    private double        sizePer;
+    private double        message;
+    private double        totalSize;
 
     public boolean isSuccess() {
         return success;
@@ -28,6 +29,14 @@ public class RunResult {
 
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+    public String getTopicName() {
+        return topicName;
+    }
+
+    public void setTopicName(String topicName) {
+        this.topicName = topicName;
     }
 
     public TypeEnums getTypeEnums() {
@@ -54,34 +63,35 @@ public class RunResult {
         this.finishDate = finishDate;
     }
 
-    public long getSizePer() {
+    public double getSizePer() {
         return sizePer;
     }
 
-    public void setSizePer(long sizePer) {
+    public void setSizePer(double sizePer) {
         this.sizePer = sizePer;
     }
 
-    public long getMessage() {
+    public double getMessage() {
         return message;
     }
 
-    public void setMessage(long message) {
+    public void setMessage(double message) {
         this.message = message;
     }
 
-    public long getTotalSize() {
+    public double getTotalSize() {
         return totalSize;
     }
 
-    public void setTotalSize(long totalSize) {
+    public void setTotalSize(double totalSize) {
         this.totalSize = totalSize;
     }
 
     @Override
     public String toString() {
-        return "RunResult{" + "success=" + success + ", typeEnums=" + typeEnums + ", startDate="
-               + startDate + ", finishDate=" + finishDate + ", sizePer=" + sizePer + ", message="
-               + message + ", totalSize=" + totalSize + '}';
+        return "RunResult{" + "success=" + success + ", topicName='" + topicName + '\''
+               + ", typeEnums=" + typeEnums + ", startDate=" + startDate + ", finishDate="
+               + finishDate + ", sizePer=" + sizePer + ", message=" + message + ", totalSize="
+               + totalSize + '}';
     }
 }

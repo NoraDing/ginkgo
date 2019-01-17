@@ -13,36 +13,36 @@ import java.time.LocalDateTime;
  */
 public class StatisticsInfo {
 
-    private long          message;
-    private long          sizePer;
-    private long          totalSize;
+    private double        message;
+    private double        sizePer;
+    private double        totalSize;
 
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
     private double        mbSecs;
     private double        nMessageSecs;
 
-    public long getMessage() {
+    public double getMessage() {
         return message;
     }
 
-    public void setMessage(long message) {
+    public void setMessage(double message) {
         this.message = message;
     }
 
-    public long getSizePer() {
+    public double getSizePer() {
         return sizePer;
     }
 
-    public void setSizePer(long sizePer) {
+    public void setSizePer(double sizePer) {
         this.sizePer = sizePer;
     }
 
-    public long getTotalSize() {
+    public double getTotalSize() {
         return totalSize;
     }
 
-    public void setTotalSize(long totalSize) {
+    public void setTotalSize(double totalSize) {
         this.totalSize = totalSize;
     }
 

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,18 +27,15 @@ public class ConsumerJob extends AbstractJob {
 
     private List<Future<RunResult>> futures;
 
-    public List<Future<RunResult>> getFutures() {
-        return futures;
-    }
-
     public ConsumerJob(String name, long messageCounter, MessageGenerator messageGenerator,
                        Properties properties) {
-        super(name, messageCounter, messageGenerator, properties);
+        super(name, messageCounter, messageGenerator, properties, null);
     }
 
     @Override
-    public RunResult call() throws Exception {
+    public List<RunResult> call() throws Exception {
 
+        List<RunResult> runResults = new ArrayList<>();
         Collection<ConsumerJobTask> consumerJobTasks = new ArrayList<>(topicList.size());
 
         LOGGER.info(
@@ -45,15 +43,24 @@ public class ConsumerJob extends AbstractJob {
         for (String topic : topicList) {
             String groupId = topic + "id";
 
-            ConsumerWrapper instance = ConsumerWrapperBuilder
-                .instance(syringaSystemConfig.getServers(), topic, groupId, properties);
-            ConsumerJobTask consumerJobTask = new ConsumerJobTask(instance, messageCounter);
+            ConsumerWrapper instance = ConsumerWrapperBuilder.instance(topic, groupId, properties);
+            ConsumerJobTask consumerJobTask = new ConsumerJobTask(topic, instance, messageCounter);
             consumerJobTasks.add(consumerJobTask);
 
         }
 
         futures = listeningExecutorService.invokeAll(consumerJobTasks);
+        if (CollectionUtils.isEmpty(futures)) {
+            return null;
 
-        return null;
+        }
+
+        for (Future<RunResult> future : futures) {
+
+            //wait all the tasks completed
+            RunResult runResult = future.get();
+            runResults.add(runResult);
+        }
+        return runResults;
     }
 }

@@ -4,8 +4,8 @@
  */
 package com.bilibili.syringa.core.consumer;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Collections;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -28,6 +28,10 @@ public class ConsumerWrapper {
 
     private String              topic;
 
+    public KafkaConsumer getKafkaConsumer() {
+        return kafkaConsumer;
+    }
+
     public ConsumerWrapper(KafkaConsumer kafkaConsumer, String topic) {
         this.kafkaConsumer = kafkaConsumer;
         this.topic = topic;
@@ -39,8 +43,7 @@ public class ConsumerWrapper {
             runResult.setStartDate(LocalDateTime.now());
         }
 
-        kafkaConsumer.subscribe(Collections.singleton(topic));
-        ConsumerRecords<String, String> records = kafkaConsumer.poll(100);
+        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(10000));
         int count = records.count();
         runResult.setMessage(runResult.getMessage() + count);
         for (ConsumerRecord<String, String> record : records) {
