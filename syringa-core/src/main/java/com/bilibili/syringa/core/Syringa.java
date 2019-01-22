@@ -28,13 +28,13 @@ public class Syringa {
     public static void main(String[] args) {
 
         try {
-
-            args = new String[] { "-type", "2", "-message", "10", "-concurrency", "2", "-size",
-                                  "10=4k,20=1k,30=6k,40=7k", "-topics", "syringa_one,syringa_two",
-                                  "-bootstrap.servers",
-                                  "10.23.58.106:9093,10.23.58.111:9093,10.23.58.119:9093",
-                                  "-configPath",
-                                  "/Users/dingsainan/soft/kafka_2.11-2.1.0/config/producer.properties" };
+            //
+            //            args = new String[] { "-type", "2", "-message", "10", "-concurrency", "3", "-size",
+            //                                  "10=4k,20=1k,30=6k,40=7k", "-topics", "syringa_one,syringa_two",
+            //                                  "-bootstrap.servers",
+            //                                  "10.23.58.106:9093,10.23.58.111:9093,10.23.58.119:9093",
+            //                                  "-configPath",
+            //                                  "/Users/dingsainan/soft/kafka_2.11-2.1.0/config/producer.properties" };
             Preconditions.checkArgument(args != null && args.length > 0);
 
             SyringaContext syringaContext = SyringaContext.getInstance();

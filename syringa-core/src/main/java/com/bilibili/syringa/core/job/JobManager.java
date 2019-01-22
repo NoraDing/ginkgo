@@ -56,7 +56,7 @@ public class JobManager extends AbstractIdleService {
     protected void startUp() throws Exception {
 
         //转配成作业的配置 
-        long threadMessage = new BigDecimal(messages).divide(new BigDecimal(concurrency))
+        long threadMessage = new BigDecimal(messages).divide(new BigDecimal(concurrency), 5)
             .longValue();
 
         for (int j = 0; j < concurrency; j++) {

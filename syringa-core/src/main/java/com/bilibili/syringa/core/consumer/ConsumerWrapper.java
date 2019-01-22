@@ -41,7 +41,7 @@ public class ConsumerWrapper {
             runResult.setStartDate(LocalDateTime.now());
         }
 
-        ConsumerRecords<Byte[], Byte[]> records = kafkaConsumer.poll(Duration.ofMillis(1000));
+        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(1000));
         long count = records.count();
         runResult.setMessage(runResult.getMessage() + count);
 
@@ -49,15 +49,15 @@ public class ConsumerWrapper {
             LOGGER.info("we has value ");
 
         }
-        for (ConsumerRecord<Byte[], Byte[]> record : records) {
+        for (ConsumerRecord<String, String> record : records) {
 
             if (record.key() != null) {
-                int keySize = record.key().length;
+                int keySize = record.key().getBytes().length;
                 runResult.setTotalSize(runResult.getTotalSize() + keySize);
 
             }
             if (record.value() != null) {
-                int valueSize = record.value().length;
+                int valueSize = record.value().getBytes().length;
                 runResult.setTotalSize(runResult.getTotalSize() + valueSize);
 
             }
