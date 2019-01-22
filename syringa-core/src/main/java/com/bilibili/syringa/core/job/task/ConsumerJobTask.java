@@ -42,6 +42,7 @@ public class ConsumerJobTask implements Callable<RunResult> {
         runResult.setMessage(messageCounter);
         consumerWrapper.getKafkaConsumer().subscribe(Collections.singleton(topic));
 
+
         for (int i = 0; i < messageCounter; i++) {
             consumerWrapper.pollMessage(runResult);
         }

@@ -44,7 +44,7 @@ public class ConsumerWrapper {
             runResult.setStartDate(LocalDateTime.now());
         }
 
-        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(10000));
+        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(1000));
         int count = records.count();
         runResult.setMessage(runResult.getMessage() + count);
 
