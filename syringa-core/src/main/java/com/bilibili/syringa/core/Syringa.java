@@ -29,7 +29,7 @@ public class Syringa {
 
         try {
 
-            args = new String[] { "-type", "1", "-message", "10000000", "-concurrency", "5",
+            args = new String[] { "-type", "2", "-message", "100000", "-concurrency", "5",
                                   "-size", "10=4k,20=1k,30=6k,40=7k", "-topics",
                                   "syringa_one,syringa_two,syringa_three,syringa_four,syringa_five",
                                   "-bootstrap.servers",

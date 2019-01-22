@@ -31,8 +31,6 @@ public class ResultManager {
 
     public void startUp() throws Exception {
 
-        LOGGER.info("start.time, end.time,total.data.sent.in.MB, MB.sec, "
-                    + "total.data.sent.in.nMsg, nMsg.sec");
 
         statisticsInfos = new ArrayList<>();
         for (Future<List<RunResult>> runResultFuture : futureList) {
@@ -129,6 +127,8 @@ public class ResultManager {
 
         statisticsInfoSummary.setStatisticsInfos(statisticsInfos);
 
+        LOGGER.info("start.time, end.time,total.data.sent.in.MB, MB.sec, "
+                + "total.data.sent.in.nMsg, nMsg.sec");
         LOGGER.info("teh value is {}", String.valueOf(statisticsInfoSummary));
 
     }

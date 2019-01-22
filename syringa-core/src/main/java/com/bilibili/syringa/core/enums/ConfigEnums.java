@@ -28,9 +28,11 @@ public enum ConfigEnums {
 
 
     //consumer
-    GROUP_ID_CONFIG(14,"group.id"),
-    ENABLE_AUTO_COMMIT_CONFIG(14,"enable.auto.commit"),
-    AUTO_COMMIT_INTERVAL_MS_CONFIG(14,"auto.commit.interval.ms");
+    GROUP_ID_CONFIG(15,"group.id"),
+    KEY_DESERIALIZER_CLASS_CONFIG(16,"key.deserializer"),
+    VALUE_DESERIALIZER_CLASS_CONFIG(17,"value.deserializer"),
+    ENABLE_AUTO_COMMIT_CONFIG(18,"enable.auto.commit"),
+    AUTO_COMMIT_INTERVAL_MS_CONFIG(19,"auto.commit.interval.ms");
 
 
 

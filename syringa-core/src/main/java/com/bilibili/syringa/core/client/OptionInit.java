@@ -155,20 +155,6 @@ public class OptionInit extends AbstractIdleService {
         }
         properties.put(ConfigEnums.BOOTSTRAP_SERVERS_CONFIG.getField(), servers);
 
-        o = properties.get(ConfigEnums.KEY_SERIALIZER_CLASS_CONFIG.getField());
-        if (o == null) {
-            properties.put(ConfigEnums.KEY_SERIALIZER_CLASS_CONFIG.getField(),
-                "org.apache.kafka.common.serialization.StringSerializer");
-
-        }
-
-        o = properties.get(ConfigEnums.VALUE_SERIALIZER_CLASS_CONFIG.getField());
-        if (o == null) {
-            properties.put(ConfigEnums.VALUE_SERIALIZER_CLASS_CONFIG.getField(),
-                "org.apache.kafka.common.serialization.StringSerializer");
-
-        }
-
     }
 
     private void sizeCheck(String size) {

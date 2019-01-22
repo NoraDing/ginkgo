@@ -7,6 +7,8 @@ import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
+import com.bilibili.syringa.core.enums.ConfigEnums;
+
 /**
  *
  * @author xuezhaoming
@@ -22,9 +24,10 @@ public class ConsumerWrapperBuilder {
     public static ConsumerWrapper instance(String topic, String groupId, Properties properties) {
 
         properties.put("group.id", groupId);
-        properties.put("key.deserializer",
+
+        properties.put(ConfigEnums.KEY_DESERIALIZER_CLASS_CONFIG.getField(),
             "org.apache.kafka.common.serialization.StringDeserializer");
-        properties.put("value.deserializer",
+        properties.put(ConfigEnums.VALUE_DESERIALIZER_CLASS_CONFIG.getField(),
             "org.apache.kafka.common.serialization.StringDeserializer");
 
         KafkaConsumer kafkaConsumer = new KafkaConsumer<>(properties);

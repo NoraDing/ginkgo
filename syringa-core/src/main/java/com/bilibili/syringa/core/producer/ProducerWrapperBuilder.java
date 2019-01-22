@@ -25,6 +25,12 @@ public class ProducerWrapperBuilder {
     public static ProducerWrapper instance(String topic, MessageGenerator messageGenerator,
                                            Properties properties) {
 
+        properties.put(ConfigEnums.KEY_SERIALIZER_CLASS_CONFIG.getField(),
+            "org.apache.kafka.common.serialization.StringSerializer");
+
+        properties.put(ConfigEnums.VALUE_SERIALIZER_CLASS_CONFIG.getField(),
+            "org.apache.kafka.common.serialization.StringSerializer");
+
         KafkaProducer kafkaProducer = new KafkaProducer<String, String>(properties);
 
         return new ProducerWrapper(kafkaProducer, topic, messageGenerator);
