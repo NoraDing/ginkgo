@@ -48,8 +48,9 @@ public class ResultManager {
                 }
 
                 double message = runResult.getMessage();
-                double sizePer = runResult.getSizePer();
-                double totalSize = BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(sizePer))
+                double totalSize = runResult.getTotalSize();
+
+                double totalSizeMb = BigDecimal.valueOf(totalSize)
                     .divide(BigDecimal.valueOf(SCALE), 5, BigDecimal.ROUND_HALF_UP)
                     .divide(BigDecimal.valueOf(SCALE), 5, BigDecimal.ROUND_HALF_UP).doubleValue();
 
@@ -72,7 +73,7 @@ public class ResultManager {
                     continue;
 
                 }
-                double mbSec = BigDecimal.valueOf(totalSize)
+                double mbSec = BigDecimal.valueOf(totalSizeMb)
                     .divide(BigDecimal.valueOf(duration), 5, BigDecimal.ROUND_HALF_UP)
                     .doubleValue();
                 double nMessageSec = BigDecimal.valueOf(message)
@@ -81,8 +82,7 @@ public class ResultManager {
                 statisticsInfo.setStartDate(startDate);
                 statisticsInfo.setFinishDate(finishDate);
                 statisticsInfo.setMessage(message);
-                statisticsInfo.setTotalSize(totalSize);
-                statisticsInfo.setMbSecs(totalSize);
+                statisticsInfo.setTotalSize(totalSizeMb);
                 statisticsInfo.setMbSecs(mbSec);
                 statisticsInfo.setnMessageSecs(nMessageSec);
                 statisticsInfos.add(statisticsInfo);

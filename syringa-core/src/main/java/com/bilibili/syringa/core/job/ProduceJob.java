@@ -5,10 +5,12 @@ package com.bilibili.syringa.core.job;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,11 @@ public class ProduceJob extends AbstractJob {
         futures = listeningExecutorService.invokeAll(producerJobTasks);
 
         //对future进行统计,返回run Result list
+        if (CollectionUtils.isEmpty(futures)) {
+            LOGGER.warn("no valid producer task can be found");
+            return Collections.emptyList();
+        }
+
 
         for (Future<RunResult> future : futures) {
             RunResult runResult = future.get();

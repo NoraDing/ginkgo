@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class StatisticsInfo {
 
     private double        message;
-    private double        sizePer;
     private double        totalSize;
 
     private LocalDateTime startDate;
@@ -28,14 +27,6 @@ public class StatisticsInfo {
 
     public void setMessage(double message) {
         this.message = message;
-    }
-
-    public double getSizePer() {
-        return sizePer;
-    }
-
-    public void setSizePer(double sizePer) {
-        this.sizePer = sizePer;
     }
 
     public double getTotalSize() {
@@ -80,8 +71,8 @@ public class StatisticsInfo {
 
     @Override
     public String toString() {
-        return "StatisticsInfo{" + "message=" + message + ", sizePer=" + sizePer + ", totalSize="
-               + totalSize + ", startDate=" + startDate + ", finishDate=" + finishDate + ", mbSecs="
-               + mbSecs + ", nMessageSecs=" + nMessageSecs + '}';
+        return "StatisticsInfo{" + "message=" + message + ", totalSize=" + totalSize
+               + ", startDate=" + startDate + ", finishDate=" + finishDate + ", mbSecs=" + mbSecs
+               + ", nMessageSecs=" + nMessageSecs + '}';
     }
 }

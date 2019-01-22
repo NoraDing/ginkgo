@@ -19,7 +19,6 @@ public class RunResult {
     private TypeEnums     typeEnums;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
-    private double        sizePer;
     private double        message;
     private double        totalSize;
 
@@ -63,14 +62,6 @@ public class RunResult {
         this.finishDate = finishDate;
     }
 
-    public double getSizePer() {
-        return sizePer;
-    }
-
-    public void setSizePer(double sizePer) {
-        this.sizePer = sizePer;
-    }
-
     public double getMessage() {
         return message;
     }
@@ -91,7 +82,6 @@ public class RunResult {
     public String toString() {
         return "RunResult{" + "success=" + success + ", topicName='" + topicName + '\''
                + ", typeEnums=" + typeEnums + ", startDate=" + startDate + ", finishDate="
-               + finishDate + ", sizePer=" + sizePer + ", message=" + message + ", totalSize="
-               + totalSize + '}';
+               + finishDate + ", message=" + message + ", totalSize=" + totalSize + '}';
     }
 }

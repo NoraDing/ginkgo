@@ -39,6 +39,7 @@ public class ConsumerWrapper {
     }
 
     public void pollMessage(RunResult runResult) {
+
         if (runResult.getStartDate() == null) {
             runResult.setStartDate(LocalDateTime.now());
         }
@@ -46,6 +47,7 @@ public class ConsumerWrapper {
         ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(10000));
         int count = records.count();
         runResult.setMessage(runResult.getMessage() + count);
+
         for (ConsumerRecord<String, String> record : records) {
             int keySize = record.key().getBytes().length;
             int valueSize = record.value().getBytes().length;

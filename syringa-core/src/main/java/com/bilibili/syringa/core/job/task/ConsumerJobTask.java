@@ -22,7 +22,6 @@ import com.bilibili.syringa.core.statistics.RunResult;
 public class ConsumerJobTask implements Callable<RunResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProducerJobTask.class);
-    private static final int    SCALE  = 1024;
 
     private ConsumerWrapper     consumerWrapper;
     private long                messageCounter;

@@ -5,6 +5,7 @@ package com.bilibili.syringa.core.job;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Future;
@@ -38,8 +39,6 @@ public class ConsumerJob extends AbstractJob {
         List<RunResult> runResults = new ArrayList<>();
         Collection<ConsumerJobTask> consumerJobTasks = new ArrayList<>(topicList.size());
 
-        LOGGER.info(
-            "start.time, end.time, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec");
         for (String topic : topicList) {
             String groupId = topic + "id";
 
@@ -51,7 +50,8 @@ public class ConsumerJob extends AbstractJob {
 
         futures = listeningExecutorService.invokeAll(consumerJobTasks);
         if (CollectionUtils.isEmpty(futures)) {
-            return null;
+            LOGGER.warn("no valid consumer task can be found");
+            return Collections.emptyList();
 
         }
 
