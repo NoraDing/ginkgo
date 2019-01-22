@@ -55,6 +55,17 @@ public class ResultManager {
 
                 LocalDateTime startDate = runResult.getStartDate();
                 LocalDateTime finishDate = runResult.getFinishDate();
+                if (startDate == null) {
+                    LOGGER.warn("the startDate is null");
+                    continue;
+
+                }
+
+                if (finishDate == null) {
+                    LOGGER.warn("the finishDate is null");
+                    continue;
+
+                }
                 long duration = Duration.between(startDate, finishDate).getSeconds();
                 if (duration == 0) {
                     LOGGER.warn("no need catch this record");
@@ -83,6 +94,7 @@ public class ResultManager {
     }
 
     public void infoStatistics() {
+
         if (CollectionUtils.isEmpty(statisticsInfos)) {
             LOGGER.info("no info can be found");
             System.exit(-1);
@@ -117,7 +129,7 @@ public class ResultManager {
 
         statisticsInfoSummary.setStatisticsInfos(statisticsInfos);
 
-        LOGGER.info("teh value is {}", statisticsInfoSummary.toString());
+        LOGGER.info("teh value is {}", String.valueOf(statisticsInfoSummary));
 
     }
 
