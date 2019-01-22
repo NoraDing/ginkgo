@@ -4,6 +4,7 @@
 package com.bilibili.syringa.core.producer;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -58,15 +59,19 @@ public class ProducerWrapper {
 
         String message = new String(messageBytes);
 
-        kafkaProducer.send(new ProducerRecord<String, String>(topic, message), new Callback() {
+        try {
+            kafkaProducer.send(new ProducerRecord<String, String>(topic, message), new Callback() {
 
-            @Override
-            public void onCompletion(RecordMetadata metadata, Exception exception) {
-                runResult.setFinishDate(LocalDateTime.now());
-            }
-        });
+                @Override
+                public void onCompletion(RecordMetadata metadata, Exception exception) {
+                    runResult.setFinishDate(LocalDateTime.now());
+                }
+            }).get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error("send message had issue", e);
+        }
 
-        runResult.setFinishDate(LocalDateTime.now());
+        //        runResult.setFinishDate(LocalDateTime.now());
 
     }
 }

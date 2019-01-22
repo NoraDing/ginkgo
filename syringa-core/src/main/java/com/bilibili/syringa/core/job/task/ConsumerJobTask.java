@@ -4,7 +4,7 @@
  */
 package com.bilibili.syringa.core.job.task;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -15,7 +15,6 @@ import com.bilibili.syringa.core.enums.TypeEnums;
 import com.bilibili.syringa.core.statistics.RunResult;
 
 /**
- *
  * @author dingsainan
  * @version $Id: ConsumerJobTask.java, v 0.1 2019-01-15 下午8:15 dingsainan Exp $$
  */
@@ -25,10 +24,11 @@ public class ConsumerJobTask implements Callable<RunResult> {
 
     private ConsumerWrapper     consumerWrapper;
     private long                messageCounter;
-    private String              topic;
+    private List<String>        topics;
 
-    public ConsumerJobTask(String topic, ConsumerWrapper consumerWrapper, long messageCounter) {
-        this.topic = topic;
+    public ConsumerJobTask(List<String> topics, ConsumerWrapper consumerWrapper,
+                           long messageCounter) {
+        this.topics = topics;
         this.consumerWrapper = consumerWrapper;
         this.messageCounter = messageCounter;
     }
@@ -37,14 +37,14 @@ public class ConsumerJobTask implements Callable<RunResult> {
     public RunResult call() throws Exception {
         RunResult runResult = new RunResult();
 
-        runResult.setTopicName(topic);
+        runResult.setTopicName(String.valueOf(topics));
         runResult.setTypeEnums(TypeEnums.CONSUMER);
         runResult.setMessage(messageCounter);
-        consumerWrapper.getKafkaConsumer().subscribe(Collections.singleton(topic));
+        consumerWrapper.getKafkaConsumer().subscribe(topics);
 
-
-        for (int i = 0; i < messageCounter; i++) {
-            consumerWrapper.pollMessage(runResult);
+        while (messageCounter > 0) {
+            long count = consumerWrapper.pollMessage(runResult);
+            messageCounter = messageCounter - count;
         }
         runResult.setSuccess(true);
 

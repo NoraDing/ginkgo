@@ -34,7 +34,6 @@ public class ResultManager {
         statisticsInfos = new ArrayList<>();
         for (Future<List<RunResult>> runResultFuture : futureList) {
             StatisticsInfo statisticsInfo = new StatisticsInfo();
-            boolean cancelled = runResultFuture.isCancelled();
             List<RunResult> runResults = runResultFuture.get();
 
             for (RunResult runResult : runResults) {
@@ -64,18 +63,20 @@ public class ResultManager {
                     continue;
 
                 }
-                long duration = Duration.between(startDate, finishDate).getSeconds();
+
+                long duration = Duration.between(startDate, finishDate).toMillis();
                 if (duration == 0) {
                     LOGGER.warn("no need catch this record");
                     continue;
 
                 }
-                double mbSec = BigDecimal.valueOf(totalSizeMb)
+                double mbSec = BigDecimal.valueOf(totalSizeMb).multiply(BigDecimal.valueOf(1000))
                     .divide(BigDecimal.valueOf(duration), 5, BigDecimal.ROUND_HALF_UP)
                     .doubleValue();
-                double nMessageSec = BigDecimal.valueOf(message)
+                double nMessageSec = BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(1000))
                     .divide(BigDecimal.valueOf(duration), 5, BigDecimal.ROUND_HALF_UP)
                     .doubleValue();
+                statisticsInfo.setTopic(runResult.getTopicName());
                 statisticsInfo.setStartDate(startDate);
                 statisticsInfo.setFinishDate(finishDate);
                 statisticsInfo.setMessage(message);

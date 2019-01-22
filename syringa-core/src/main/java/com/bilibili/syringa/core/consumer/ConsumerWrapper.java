@@ -26,35 +26,46 @@ public class ConsumerWrapper {
 
     private KafkaConsumer       kafkaConsumer;
 
-    private String              topic;
-
     public KafkaConsumer getKafkaConsumer() {
         return kafkaConsumer;
     }
 
-    public ConsumerWrapper(KafkaConsumer kafkaConsumer, String topic) {
+    public ConsumerWrapper(KafkaConsumer kafkaConsumer) {
         this.kafkaConsumer = kafkaConsumer;
-        this.topic = topic;
 
     }
 
-    public void pollMessage(RunResult runResult) {
+    public long pollMessage(RunResult runResult) {
 
         if (runResult.getStartDate() == null) {
             runResult.setStartDate(LocalDateTime.now());
         }
 
-        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(1000));
-        int count = records.count();
+        ConsumerRecords<Byte[], Byte[]> records = kafkaConsumer.poll(Duration.ofMillis(1000));
+        long count = records.count();
         runResult.setMessage(runResult.getMessage() + count);
 
-        for (ConsumerRecord<String, String> record : records) {
-            int keySize = record.key().getBytes().length;
-            int valueSize = record.value().getBytes().length;
-            runResult.setTotalSize(runResult.getTotalSize() + keySize + valueSize);
-        }
+        if (count != 0) {
+            LOGGER.info("we has value ");
 
+        }
+        for (ConsumerRecord<Byte[], Byte[]> record : records) {
+
+            if (record.key() != null) {
+                int keySize = record.key().length;
+                runResult.setTotalSize(runResult.getTotalSize() + keySize);
+
+            }
+            if (record.value() != null) {
+                int valueSize = record.value().length;
+                runResult.setTotalSize(runResult.getTotalSize() + valueSize);
+
+            }
+        }
         runResult.setFinishDate(LocalDateTime.now());
+
+        return count;
+
     }
 
 }

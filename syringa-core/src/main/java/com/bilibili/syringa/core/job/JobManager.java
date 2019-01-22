@@ -64,8 +64,7 @@ public class JobManager extends AbstractIdleService {
             switch (type) {
                 case CONSUMER:
                     job = new ConsumerJob("consumer-job-" + j, threadMessage, messageGenerator,
-                        properties);
-                    ((ConsumerJob) job).startUp();
+                        properties, topicList);
 
                     break;
                 case PRODUCER:

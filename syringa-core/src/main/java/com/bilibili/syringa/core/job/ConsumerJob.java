@@ -29,24 +29,22 @@ public class ConsumerJob extends AbstractJob {
     private List<Future<RunResult>> futures;
 
     public ConsumerJob(String name, long messageCounter, MessageGenerator messageGenerator,
-                       Properties properties) {
-        super(name, messageCounter, messageGenerator, properties, null);
+                       Properties properties, List<String> topicList) {
+        super(name, messageCounter, messageGenerator, properties, topicList);
     }
 
     @Override
     public List<RunResult> call() throws Exception {
 
         List<RunResult> runResults = new ArrayList<>();
+
         Collection<ConsumerJobTask> consumerJobTasks = new ArrayList<>(topicList.size());
 
-        for (String topic : topicList) {
-            String groupId = topic + "id";
+        String groupId = name + "group";
 
-            ConsumerWrapper instance = ConsumerWrapperBuilder.instance(topic, groupId, properties);
-            ConsumerJobTask consumerJobTask = new ConsumerJobTask(topic, instance, messageCounter);
-            consumerJobTasks.add(consumerJobTask);
-
-        }
+        ConsumerWrapper instance = ConsumerWrapperBuilder.instance(groupId, properties);
+        ConsumerJobTask consumerJobTask = new ConsumerJobTask(topicList, instance, messageCounter);
+        consumerJobTasks.add(consumerJobTask);
 
         futures = listeningExecutorService.invokeAll(consumerJobTasks);
         if (CollectionUtils.isEmpty(futures)) {

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
  */
 public class StatisticsInfo {
 
+    private String        topic;
     private double        message;
     private double        totalSize;
 
@@ -20,6 +21,14 @@ public class StatisticsInfo {
     private LocalDateTime finishDate;
     private double        mbSecs;
     private double        nMessageSecs;
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 
     public double getMessage() {
         return message;
@@ -71,8 +80,8 @@ public class StatisticsInfo {
 
     @Override
     public String toString() {
-        return "StatisticsInfo{" + "message=" + message + ", totalSize=" + totalSize
-               + ", startDate=" + startDate + ", finishDate=" + finishDate + ", mbSecs=" + mbSecs
-               + ", nMessageSecs=" + nMessageSecs + '}';
+        return "StatisticsInfo{" + "topic='" + topic + '\'' + ", message=" + message
+               + ", totalSize=" + totalSize + ", startDate=" + startDate + ", finishDate="
+               + finishDate + ", mbSecs=" + mbSecs + ", nMessageSecs=" + nMessageSecs + '}';
     }
 }
