@@ -24,7 +24,6 @@
     <properties>
         <project.version>0.0.1-SNAPSHOT</project.version>
         <kafka.version>2.1.0</kafka.version>
-        <kafka.version>0.10.1.1</kafka.version>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.7</slf4j.version>
         <logback.version>1.1.7</logback.version>
@@ -37,14 +36,6 @@
 
     <!--  dependencies 配置的依赖 子项目会自动引入,不需要另配 -->
     <dependencies>
-
-
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <!--<version>RELEASE</version>-->
-        </dependency>
-
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
@@ -62,6 +53,19 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- kafka -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.12</artifactId>
+            <version>${kafka.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 
     </dependencies>
 
@@ -70,8 +74,6 @@
     <dependencyManagement>
 
         <dependencies>
-
-
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
@@ -121,7 +123,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>18.0</version>
+                <version>27.0.1-jre</version>
             </dependency>
 
 
