@@ -60,6 +60,8 @@ public class JobManager extends AbstractIdleService {
             .longValue();
 
         for (int j = 0; j < concurrency; j++) {
+
+            LOGGER.info("the concurrency is {}", j);
             Job job = null;
             switch (type) {
                 case CONSUMER:

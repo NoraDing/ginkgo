@@ -29,8 +29,8 @@ public class Syringa {
 
         try {
             //
-            //            args = new String[] { "-type", "2", "-message", "10", "-concurrency", "3", "-size",
-            //                                  "10=4k,20=1k,30=6k,40=7k", "-topics", "syringa_one,syringa_two",
+            //            args = new String[] { "-type", "1", "-message", "20", "-concurrency", "20", "-size",
+            //                                  "10=4k,20=10k,30=60k,40=700K", "-topics", "syringa_one,syringa_two",
             //                                  "-bootstrap.servers",
             //                                  "10.23.58.106:9093,10.23.58.111:9093,10.23.58.119:9093",
             //                                  "-configPath",

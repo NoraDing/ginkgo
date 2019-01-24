@@ -62,7 +62,6 @@ public class ProduceJob extends AbstractJob {
             return Collections.emptyList();
         }
 
-
         for (Future<RunResult> future : futures) {
             RunResult runResult = future.get();
             runResults.add(runResult);

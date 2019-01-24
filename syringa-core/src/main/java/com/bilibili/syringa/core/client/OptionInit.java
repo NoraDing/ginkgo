@@ -175,6 +175,7 @@ public class OptionInit extends AbstractIdleService {
 
             String messageSizeStr = strings.get(1);
             Long messageSizeLong = parseMessageSizeStr(messageSizeStr.toLowerCase());
+            LOGGER.info("teh messageSizeLong is {}", messageSizeLong);
 
             Preconditions.checkNotNull(messageSizeLong != null, "messageSizeLong can not be null");
             jobMessageConfig.setSize(messageSizeLong);
