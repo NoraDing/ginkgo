@@ -13,17 +13,14 @@
         <module>syringa-core</module>
     </modules>
 
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.5.8.RELEASE</version>
     </parent>
 
-
     <properties>
         <project.version>0.0.1-SNAPSHOT</project.version>
-        <kafka.version>2.1.0</kafka.version>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.7</slf4j.version>
         <logback.version>1.1.7</logback.version>
@@ -31,43 +28,38 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <joda.version>2.9.4</joda.version>
         <javax-mail.version>1.5.2</javax-mail.version>
-
+        <fastjson.version>1.2.54</fastjson.version>
     </properties>
 
-    <!--  dependencies 配置的依赖 子项目会自动引入,不需要另配 -->
-    <dependencies>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-        </dependency>
+    <!-- dependencies 配置的依赖 子项目会自动引入,不需要另配 -->
+<!--    <dependencies>-->
+<!--        <dependency>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-core</artifactId>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-classic</artifactId>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>log4j</groupId>-->
+<!--                    <artifactId>log4j</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.slf4j</groupId>-->
+<!--                    <artifactId>slf4j-api</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
 
-        <!-- testng -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- kafka -->
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.12</artifactId>
-            <version>${kafka.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-
-    </dependencies>
+<!--        &lt;!&ndash; testing &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>junit</groupId>-->
+<!--            <artifactId>junit</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+<!--    </dependencies>-->
 
 
     <!--  dependencies 配置的依赖 子项目引入时只需声明groupid,artifactid -->
@@ -80,6 +72,11 @@
                 <version>1.1.12</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>commons-cli</groupId>
@@ -120,12 +117,6 @@
                 <version>${slf4j.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>27.0.1-jre</version>
-            </dependency>
-
 
             <dependency>
                 <groupId>ch.qos.logback</groupId>
@@ -137,6 +128,16 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
 
@@ -172,17 +173,13 @@
                 <artifactId>commons-dbcp</artifactId>
                 <version>${commons-dbcp.version}</version>
             </dependency>
-
             <!-- commons end -->
-
 
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>2.7</version>
             </dependency>
-
-
         </dependencies>
     </dependencyManagement>
 
@@ -221,11 +218,8 @@
             <url>http://nexus.bilibili.co/content/repositories/snapshots/</url>
         </repository>
     </repositories>
-
     <build>
         <plugins>
-
-
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.1.2</version>
@@ -250,6 +244,26 @@
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+                <configuration>
+                    <failOnWarning>false</failOnWarning>
+                    <ignoreNonCompile>true</ignoreNonCompile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>analyze-only</goal>
+                            <goal>analyze-duplicate</goal>
+                            <goal>analyze-dep-mgt</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

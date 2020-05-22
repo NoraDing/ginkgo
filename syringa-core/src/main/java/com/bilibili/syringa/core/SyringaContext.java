@@ -3,11 +3,15 @@
  */
 package com.bilibili.syringa.core;
 
-import com.google.common.eventbus.AsyncEventBus;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 
 import com.bilibili.syringa.core.client.OptionInit;
 import com.bilibili.syringa.core.config.SyringaSystemConfig;
 import com.bilibili.syringa.core.job.MessageGenerator;
+import com.bilibili.syringa.core.statistics.RunResult;
+import com.google.common.eventbus.AsyncEventBus;
 
 /**
  * @author xuezhaoming
@@ -17,20 +21,41 @@ public class SyringaContext {
 
     private static SyringaContext syringaContext = new SyringaContext();
 
-    private OptionInit            optionInit;
+    private CountDownLatch countDownLatch;
+    private OptionInit optionInit;
 
-    private AsyncEventBus         asyncEventBus;
+    private AsyncEventBus asyncEventBus;
 
-    private MessageGenerator      messageGenerator;
+    private MessageGenerator messageGenerator;
 
-    private boolean               isFinish;
+    private List<RunResult> runResults;
+
+    private boolean isFinish;
+
 
     private SyringaContext() {
+
 
     }
 
     public static SyringaContext getInstance() {
         return syringaContext;
+    }
+
+    public List<RunResult> getRunResults() {
+        return runResults;
+    }
+
+    public void setRunResults(List<RunResult> runResults) {
+        this.runResults = runResults;
+    }
+
+    public void setCountDownLatch(CountDownLatch countDownLatch) {
+        this.countDownLatch = countDownLatch;
+    }
+
+    public CountDownLatch getCountDownLatch() {
+        return countDownLatch;
     }
 
     private SyringaSystemConfig syringaSystemConfig;

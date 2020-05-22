@@ -10,7 +10,9 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bilibili.syringa.core.SyringaContext;
 import com.bilibili.syringa.core.consumer.ConsumerWrapper;
+import com.bilibili.syringa.core.consumer.ConsumerWrapperBuilder;
 import com.bilibili.syringa.core.enums.TypeEnums;
 import com.bilibili.syringa.core.statistics.RunResult;
 
@@ -18,19 +20,20 @@ import com.bilibili.syringa.core.statistics.RunResult;
  * @author dingsainan
  * @version $Id: ConsumerJobTask.java, v 0.1 2019-01-15 下午8:15 dingsainan Exp $$
  */
-public class ConsumerJobTask implements Callable<RunResult> {
+public class ConsumerTask implements Callable<RunResult> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProducerJobTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProducerTask.class);
 
     private ConsumerWrapper     consumerWrapper;
     private long                messageCounter;
     private List<String>        topics;
 
-    public ConsumerJobTask(List<String> topics, ConsumerWrapper consumerWrapper,
-                           long messageCounter) {
+    public ConsumerTask(SyringaContext syringaContext, String groupId, long messageCounter) {
         this.topics = topics;
         this.consumerWrapper = consumerWrapper;
         this.messageCounter = messageCounter;
+        this.consumerWrapper = ConsumerWrapperBuilder.instance(groupId,
+            syringaContext.getSyringaSystemConfig().getProperties());
     }
 
     @Override

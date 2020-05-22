@@ -14,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.BaseTest;
+import com.bilibili.syringa.core.SyringaContext;
 
 /**
- *
  * @author dingsainan
  * @version $Id: MessageGeneratorTest.java, v 0.1 2019-01-15 下午2:50 dingsainan Exp $$
  */
@@ -47,19 +47,18 @@ public class MessageGeneratorTest extends BaseTest {
         jobMessageConfigList.add(jobMessageConfig2);
         jobMessageConfigList.add(jobMessageConfig3);
         jobMessageConfigList.add(jobMessageConfig4);
-        MessageGenerator messageGenerator = new MessageGenerator(jobMessageConfigList);
+        MessageGenerator messageGenerator = new MessageGenerator(SyringaContext.getInstance());
         messageGenerator.startAsync().awaitRunning();
-        Map<JobMessageConfig, byte[]> messages = messageGenerator.getMessages();
-        Iterator<Map.Entry<JobMessageConfig, byte[]>> iterator = messages.entrySet().iterator();
+        Map<JobMessageConfig, String> messages = messageGenerator.getMessages();
+        Iterator<Map.Entry<JobMessageConfig, String>> iterator = messages.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<JobMessageConfig, byte[]> next = iterator.next();
+            Map.Entry<JobMessageConfig, String> next = iterator.next();
             LOGGER.info("the next key is {}", next.getKey());
-            LOGGER.info("the next value is {}", next.getValue().length);
+            LOGGER.info("the next value is {}", next.getValue().length());
         }
 
-        byte[] message = messageGenerator.getMessage();
+        String message = messageGenerator.getMessage();
         LOGGER.info("the next value is {}", message);
-
 
     }
 }

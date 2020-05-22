@@ -3,70 +3,89 @@
  */
 package com.bilibili.syringa.core.job;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.Future;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bilibili.syringa.core.job.task.ProducerJobTask;
-import com.bilibili.syringa.core.producer.ProducerWrapper;
-import com.bilibili.syringa.core.producer.ProducerWrapperBuilder;
-import com.bilibili.syringa.core.statistics.RunResult;
+import com.bilibili.syringa.core.job.task.ProducerTask;
+import com.bilibili.syringa.core.statistics.StatisticsInfo;
 
 /**
- *
  * @author xuezhaoming
  * @version $Id: ProduceJob.java, v 0.1 2019-01-15 2:29 PM Exp $$
  */
 public class ProduceJob extends AbstractJob {
-    private static final Logger     LOGGER  = LoggerFactory.getLogger(ConsumerJob.class);
 
-    private List<Future<RunResult>> futures = new ArrayList<>();
+    private static final int SCALE = 1024;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProduceJob.class);
+    private List<StatisticsInfo> statisticsInfos;
+    private List<String> topicList;
+    protected long messageCounter;
 
-    public List<Future<RunResult>> getFutures() {
-        return futures;
+    public void setStatisticsInfos(List<StatisticsInfo> statisticsInfos) {
+        this.statisticsInfos = statisticsInfos;
     }
 
-    public ProduceJob(String name, long messageCounter, MessageGenerator messageGenerator,
-                      Properties properties, List<String> topicList) {
-        super(name, messageCounter, messageGenerator, properties, topicList);
+    public ProduceJob(long messageCounter) {
+        this.messageCounter = messageCounter;
+        this.topicList = syringaContext.getSyringaSystemConfig().getTopicList();
     }
 
     @Override
-    public List<RunResult> call() throws Exception {
-
-        List<RunResult> runResults = new ArrayList<>();
-
-        Collection<ProducerJobTask> producerJobTasks = new ArrayList<>(topicList.size());
+    public void call() {
 
         for (String topic : topicList) {
-
-            ProducerWrapper instance = ProducerWrapperBuilder.instance(topic, messageGenerator,
-                properties);
-            ProducerJobTask producerJobTask = new ProducerJobTask(topic, instance, messageCounter);
-
-            ((ArrayList<ProducerJobTask>) producerJobTasks).add(producerJobTask);
+            ProducerTask producerTask = new ProducerTask(topic,
+                    messageCounter);
+            threadPoolExecutor.submit(producerTask);
         }
+    }
 
-        futures = listeningExecutorService.invokeAll(producerJobTasks);
+    public void startUp() throws Exception {
 
-        //对future进行统计,返回run Result list
-        if (CollectionUtils.isEmpty(futures)) {
-            LOGGER.warn("no valid producer task can be found");
-            return Collections.emptyList();
-        }
-
-        for (Future<RunResult> future : futures) {
-            RunResult runResult = future.get();
-            runResults.add(runResult);
-
-        }
-        return runResults;
+        StatisticsInfo statisticsInfo = new StatisticsInfo();
+//        for (Future<RunResult> future : runResults) {
+//
+//            RunResult runResult = future.get();
+//            boolean success = runResult.isSuccess();
+//            if (!success) {
+//                continue;
+//            }
+//
+//            double message = runResult.getMessage();
+//            double totalSize = runResult.getTotalSize();
+//
+//            double totalSizeMb = BigDecimal.valueOf(totalSize)
+//                    .divide(BigDecimal.valueOf(SCALE), 5, BigDecimal.ROUND_HALF_UP)
+//                    .divide(BigDecimal.valueOf(SCALE), 5, BigDecimal.ROUND_HALF_UP).doubleValue();
+//
+//            LocalDateTime startDate = runResult.getStartDate();
+//            LocalDateTime finishDate = runResult.getFinishDate();
+//            if (startDate == null) {
+//                LOGGER.warn("the startDate is null");
+//                continue;
+//            }
+//            if (finishDate == null) {
+//                LOGGER.warn("the finishDate is null");
+//                continue;
+//            }
+//            long duration = Duration.between(startDate, finishDate).toMillis();
+//            if (duration == 0) {
+//                LOGGER.warn("no need catch this record");
+//                continue;
+//            }
+//            double mbSec = BigDecimal.valueOf(totalSizeMb).multiply(BigDecimal.valueOf(1000))
+//                    .divide(BigDecimal.valueOf(duration), 5, BigDecimal.ROUND_HALF_UP).doubleValue();
+//            double nMessageSec = BigDecimal.valueOf(message).multiply(BigDecimal.valueOf(1000))
+//                    .divide(BigDecimal.valueOf(duration), 5, BigDecimal.ROUND_HALF_UP).doubleValue();
+//            statisticsInfo.setTopic(runResult.getTopicName());
+//            statisticsInfo.setStartDate(startDate);
+//            statisticsInfo.setFinishDate(finishDate);
+//            statisticsInfo.setMessage(message);
+//            statisticsInfo.setTotalSize(totalSizeMb);
+//            statisticsInfo.setMbSecs(mbSec);
+//            statisticsInfo.setnMessageSecs(nMessageSec);
+//            statisticsInfos.add(statisticsInfo);
+//        }
     }
 }

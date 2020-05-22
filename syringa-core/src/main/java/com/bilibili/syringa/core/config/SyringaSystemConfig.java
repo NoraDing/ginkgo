@@ -15,13 +15,19 @@ import com.bilibili.syringa.core.job.JobMessageConfig;
  */
 public class SyringaSystemConfig {
 
-    private TypeEnums              type;
-    private long                   messages;
-    private int                    concurrency;
+    private TypeEnums type;
+    private long messages;
+    private int concurrency;
     private List<JobMessageConfig> jobMessageConfigList;
-    private List<String>           topicList;
-    private String                 servers;
-    private Properties             properties;
+    private List<String> topicList;
+    private String servers;
+    private String blacklistZkPath;
+
+    private Integer minRecordSize;
+    private Integer maxRecordSize;
+    private Integer minBatchSize;
+    private Integer maxBatchSize;
+    private Properties properties;
 
     public TypeEnums getType() {
         return type;
@@ -71,6 +77,46 @@ public class SyringaSystemConfig {
         this.servers = servers;
     }
 
+    public String getBlacklistZkPath() {
+        return blacklistZkPath;
+    }
+
+    public void setBlacklistZkPath(String blacklistZkPath) {
+        this.blacklistZkPath = blacklistZkPath;
+    }
+
+    public Integer getMinRecordSize() {
+        return minRecordSize;
+    }
+
+    public void setMinRecordSize(Integer minRecordSize) {
+        this.minRecordSize = minRecordSize;
+    }
+
+    public Integer getMaxRecordSize() {
+        return maxRecordSize;
+    }
+
+    public void setMaxRecordSize(Integer maxRecordSize) {
+        this.maxRecordSize = maxRecordSize;
+    }
+
+    public Integer getMinBatchSize() {
+        return minBatchSize;
+    }
+
+    public void setMinBatchSize(Integer minBatchSize) {
+        this.minBatchSize = minBatchSize;
+    }
+
+    public Integer getMaxBatchSize() {
+        return maxBatchSize;
+    }
+
+    public void setMaxBatchSize(Integer maxBatchSize) {
+        this.maxBatchSize = maxBatchSize;
+    }
+
     public Properties getProperties() {
         return properties;
     }
@@ -81,8 +127,19 @@ public class SyringaSystemConfig {
 
     @Override
     public String toString() {
-        return "SyringaSystemConfig{" + "type=" + type + ", messages=" + messages + ", concurrency="
-               + concurrency + ", jobMessageConfigList=" + jobMessageConfigList + ", topicList="
-               + topicList + ", servers='" + servers + '\'' + ", properties=" + properties + '}';
+        return "SyringaSystemConfig{" +
+                "type=" + type +
+                ", messages=" + messages +
+                ", concurrency=" + concurrency +
+                ", jobMessageConfigList=" + jobMessageConfigList +
+                ", topicList=" + topicList +
+                ", servers='" + servers + '\'' +
+                ", blacklistZkPath='" + blacklistZkPath + '\'' +
+                ", minRecordSize=" + minRecordSize +
+                ", maxRecordSize=" + maxRecordSize +
+                ", minBatchSize=" + minBatchSize +
+                ", maxBatchSize=" + maxBatchSize +
+                ", properties=" + properties +
+                '}';
     }
 }
