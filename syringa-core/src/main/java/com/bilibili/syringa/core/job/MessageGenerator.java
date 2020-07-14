@@ -9,12 +9,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.bilibili.syringa.core.util.RandomCharacter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bilibili.syringa.core.SyringaContext;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
 
@@ -24,17 +25,28 @@ import com.google.common.util.concurrent.AbstractIdleService;
  */
 public class MessageGenerator extends AbstractIdleService {
 
-    private static final Logger           LOGGER = LoggerFactory.getLogger(MessageGenerator.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(MessageGenerator.class);
 
-    private List<JobMessageConfig>        jobMessageConfigList;
-    private Map<JobMessageConfig, byte[]> messages;
+    private List<JobMessageConfig> jobMessageConfigList;
+    private Map<JobMessageConfig, String> messages;
 
-    public Map<JobMessageConfig, byte[]> getMessages() {
+    private Integer minRecordSize;
+    private Integer maxRecordSize;
+    private Integer minBatchSize;
+    private Integer maxBatchSize;
+
+    public Map<JobMessageConfig, String> getMessages() {
         return messages;
-    } 
+    }
 
-    public MessageGenerator(List<JobMessageConfig> jobMessageConfigList) {
-        this.jobMessageConfigList = jobMessageConfigList;
+    public MessageGenerator(SyringaContext syringaContext) {
+        this.jobMessageConfigList = syringaContext.getSyringaSystemConfig()
+                .getJobMessageConfigList();
+        this.minRecordSize = syringaContext.getSyringaSystemConfig().getMinRecordSize();
+        this.maxRecordSize = syringaContext.getSyringaSystemConfig().getMaxRecordSize();
+        this.minBatchSize = syringaContext.getSyringaSystemConfig().getMinBatchSize();
+        this.maxBatchSize = syringaContext.getSyringaSystemConfig().getMaxBatchSize();
     }
 
     /**
@@ -42,20 +54,20 @@ public class MessageGenerator extends AbstractIdleService {
      *
      * @return
      */
-    public byte[] getMessage() {
+    public String getMessage() {
 
-        int nextRandom = ThreadLocalRandom.current().nextInt(1,100);
-        byte[] locateValue = locate(nextRandom);
+        int nextRandom = ThreadLocalRandom.current().nextInt(1, 100);
+        String locateValue = locate(nextRandom);
         return locateValue;
     }
 
-    private byte[] locate(int nextRandom) {
+    private String locate(int nextRandom) {
 
-        Iterator<Map.Entry<JobMessageConfig, byte[]>> iterator = messages.entrySet().iterator();
+        Iterator<Map.Entry<JobMessageConfig, String>> iterator = messages.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<JobMessageConfig, byte[]> next = iterator.next();
+            Map.Entry<JobMessageConfig, String> next = iterator.next();
             JobMessageConfig key = next.getKey();
-            byte[] value = next.getValue();
+            String value = next.getValue();
             int startScale = key.getStartScale();
             int endScale = key.getEndScale();
             if (nextRandom >= startScale && nextRandom <= endScale) {
@@ -79,7 +91,6 @@ public class MessageGenerator extends AbstractIdleService {
             basePercent = intValue;
         }
         LOGGER.info("the calculate value  is {}", jobMessageConfigList.toString());
-
     }
 
     private void generateData() {
@@ -87,16 +98,11 @@ public class MessageGenerator extends AbstractIdleService {
 
         for (JobMessageConfig jobMessageConfig : jobMessageConfigList) {
             long dataSize = jobMessageConfig.getSize();
-            byte[] bytes = new byte[Math.toIntExact(dataSize)];
-            Random random = new Random();
-
-            LOGGER.info("the start date is {}", LocalDateTime.now());
-            for (int i = 0; i < bytes.length; ++i) {
-                bytes[i] = (byte) (random.nextInt() + 65);
+            StringBuilder builder = new StringBuilder();
+            for (int j = 0; j < dataSize; j++) {
+                builder.append(RandomCharacter.getRandomLowerCaseLetter());
             }
-
-            messages.put(jobMessageConfig, bytes);
-
+            messages.put(jobMessageConfig, builder.toString());
         }
 
         LOGGER.info("the end date is {}", LocalDateTime.now());

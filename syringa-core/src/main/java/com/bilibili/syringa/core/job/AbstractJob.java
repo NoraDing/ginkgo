@@ -3,15 +3,15 @@
  */
 package com.bilibili.syringa.core.job;
 
-import java.util.List;
-import java.util.Properties;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bilibili.syringa.core.SyringaContext;
-import com.bilibili.syringa.core.config.SyringaSystemConfig;
-import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -23,43 +23,29 @@ import com.google.common.util.concurrent.MoreExecutors;
  */
 public abstract class AbstractJob extends AbstractIdleService implements Job {
 
-    private static final Logger        LOGGER = LoggerFactory.getLogger(AbstractJob.class);
-
-    protected String                   name;
-
-    protected long                     messageCounter;
-
-    protected List<String>             topicList;
-
-    protected SyringaSystemConfig      syringaSystemConfig;
+    private static final Logger        LOGGER        = LoggerFactory.getLogger(AbstractJob.class);
+    private static final int           corePoolSize  = 8;
+    private static final int           maxPoolSize   = 20;
+    private static final long          keepAliveTime = 10000l;
+    private static final int           queueCapacity = 7000;
+    protected SyringaContext           syringaContext;
 
     protected ListeningExecutorService listeningExecutorService;
+    protected ThreadPoolExecutor       threadPoolExecutor;
 
-    protected AsyncEventBus            asyncEventBus;
+    public AbstractJob() {
+        threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
+            TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(queueCapacity),
+            new BasicThreadFactory.Builder().namingPattern("job-manager-%d").daemon(true).build());
 
-    protected MessageGenerator         messageGenerator;
-    protected Properties               properties;
-
-    public AbstractJob(String name, long messageCounter, MessageGenerator messageGenerator,
-                       Properties properties, List<String> topicList) {
-        this.name = name;
-        this.messageCounter = messageCounter;
-        this.messageGenerator = messageGenerator;
-        this.properties = properties;
-        this.topicList = topicList;
         listeningExecutorService = MoreExecutors.newDirectExecutorService();
-
+        syringaContext = SyringaContext.getInstance();
     }
 
     @Override
     protected void startUp() throws Exception {
 
         listeningExecutorService = MoreExecutors.newDirectExecutorService();
-        this.topicList = SyringaContext.getInstance().getSyringaSystemConfig().getTopicList();
-        this.asyncEventBus = SyringaContext.getInstance().getAsyncEventBus();
-        this.messageGenerator = SyringaContext.getInstance().getMessageGenerator();
-        this.properties = SyringaContext.getInstance().getSyringaSystemConfig().getProperties();
-
         LOGGER.info("init executor success !");
     }
 
@@ -69,15 +55,6 @@ public abstract class AbstractJob extends AbstractIdleService implements Job {
         if (listeningExecutorService != null) {
             listeningExecutorService.shutdown();
         }
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public long getMessageCounter() {
-        return messageCounter;
     }
 
 }

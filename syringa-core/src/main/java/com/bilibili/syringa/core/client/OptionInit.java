@@ -34,16 +34,16 @@ import com.google.common.util.concurrent.AbstractIdleService;
  */
 public class OptionInit extends AbstractIdleService {
 
-    private static final Logger   LOGGER              = LoggerFactory.getLogger(OptionInit.class);
-    private static final int      SCALE               = 1024;
+    private static final Logger LOGGER = LoggerFactory.getLogger(OptionInit.class);
+    private static final int SCALE = 1024;
 
-    private SyringaSystemConfig   syringaSystemConfig = new SyringaSystemConfig();
+    private SyringaSystemConfig syringaSystemConfig = new SyringaSystemConfig();
 
-    private static final Splitter EQUAL_SPLITTER      = Splitter.on("=").omitEmptyStrings();
+    private static final Splitter EQUAL_SPLITTER = Splitter.on("=").omitEmptyStrings();
 
-    private static final Splitter COMMA_SPLITTER      = Splitter.on(",").omitEmptyStrings();
+    private static final Splitter COMMA_SPLITTER = Splitter.on(",").omitEmptyStrings();
 
-    private String                args[];
+    private String args[];
 
     public OptionInit(String[] args) {
         this.args = args;
@@ -56,7 +56,6 @@ public class OptionInit extends AbstractIdleService {
         Options options = generateOptions();
         CommandLine cli = null;
         try {
-
             cli = parser.parse(options, args);//-type 1 
             String type = cli.getOptionValue("type");//1.生产者 2.消费者
             String messages = cli.getOptionValue("message");//每个批次条数
@@ -65,6 +64,11 @@ public class OptionInit extends AbstractIdleService {
             String topics = cli.getOptionValue("topics");//请求的主题
             String servers = cli.getOptionValue("bootstrap.servers");//请求的kafka地址
             String configPath = cli.getOptionValue("configPath");//生产者的参数配置
+            String minBatchSize = cli.getOptionValue("minBatchSize");
+            String maxBatchSize = cli.getOptionValue("maxBatchSize");
+            String minRecordSize = cli.getOptionValue("minRecordSize");
+            String maxRecordSize = cli.getOptionValue("maxRecordSize");
+            String blacklistZkPath = cli.getOptionValue("blacklistZkPath");
 
             Preconditions.checkNotNull(type, "type is null");
             Preconditions.checkNotNull(messages, "messages is null");
@@ -72,6 +76,7 @@ public class OptionInit extends AbstractIdleService {
             Preconditions.checkNotNull(size, "size is null");
             Preconditions.checkNotNull(topics, "topics is null");
             Preconditions.checkNotNull(servers, "servers is null");
+            Preconditions.checkNotNull(blacklistZkPath, "blacklistZkPath is null");
 
             //1.请求类型有效性检查  example -type 1 or 2 
             typeCheck(type);
@@ -92,6 +97,15 @@ public class OptionInit extends AbstractIdleService {
 
             //6.kafka地址
             syringaSystemConfig.setServers(servers);
+
+            //7.黑名单的zk路径
+            syringaSystemConfig.setBlacklistZkPath(blacklistZkPath);
+
+            //7.设置数据大小
+            syringaSystemConfig.setMinBatchSize(Integer.valueOf(minBatchSize));
+            syringaSystemConfig.setMaxBatchSize(Integer.valueOf(maxBatchSize));
+            syringaSystemConfig.setMinRecordSize(Integer.valueOf(minRecordSize));
+            syringaSystemConfig.setMaxRecordSize(Integer.valueOf(maxRecordSize));
 
             //7.configPath
             if (configPath != null) {
@@ -184,7 +198,7 @@ public class OptionInit extends AbstractIdleService {
         }
 
         double totalPercent = jobMessageConfigs.stream().mapToDouble(JobMessageConfig::getPercent)
-            .sum();
+                .sum();
 
         Preconditions.checkArgument(totalPercent == 100, "percent is sum should be 1");
 
@@ -231,10 +245,6 @@ public class OptionInit extends AbstractIdleService {
     private void messagesCheck(String messages) {
 
         Long messagesLong = Long.valueOf(messages);
-        if (messagesLong <= 0) {
-            LOGGER.error("invalid messages {}  muster bigger than zero !", messages);
-            System.exit(-1);
-        }
         syringaSystemConfig.setMessages(messagesLong);
     }
 
@@ -258,6 +268,11 @@ public class OptionInit extends AbstractIdleService {
         options.addOption("ts", "topics", true, "number of the topic ");
         options.addOption("bs", "bootstrap.servers", true, "bootstrap server  ");
         options.addOption("p", "configPath", true, "config file");
+        options.addOption("nb", "minBatchSize", true, "最小batch数");
+        options.addOption("mb", "maxBatchSize", true, "最大batch数");
+        options.addOption("nr", "minRecordSize", true, "最小record size");
+        options.addOption("mr", "maxRecordSize", true, "最大record size");
+        options.addOption("bzkP", "blacklistZkPath", true, "黑名单的zk path");
 
         return options;
     }
