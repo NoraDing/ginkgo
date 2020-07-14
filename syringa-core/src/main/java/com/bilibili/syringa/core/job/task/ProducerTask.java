@@ -49,15 +49,20 @@ public class ProducerTask implements Callable<RunResult> {
         runResult.setTypeEnums(TypeEnums.PRODUCER);
         runResult.setMessage(messageCounter);
         runResult.setStartDate(LocalDateTime.now());
-        int counter = 1;
-        while (messageCounter == -1 ? true : false || counter < messageCounter) {
-            sendMessage(runResult);
-            counter++;
+        int counter = 0;
+        try {
+            while (messageCounter == -1 ? true : false || counter < messageCounter) {
+                sendMessage(runResult);
+                counter++;
+            }
+            List<RunResult> current = SyringaContext.getInstance().getRunResults();
+            current.add(runResult);
+
+        } catch (Exception e) {
+            LOGGER.error("has exception ", e);
+        } finally {
+            kafkaProducer.close();
         }
-
-
-        List<RunResult> current = SyringaContext.getInstance().getRunResults();
-        current.add(runResult);
         return runResult;
     }
 

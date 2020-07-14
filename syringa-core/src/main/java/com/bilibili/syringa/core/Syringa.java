@@ -24,12 +24,12 @@ public class Syringa {
     private static final Logger LOGGER = LoggerFactory.getLogger(Syringa.class);
 
     public static void main(String[] args) {
-//        args = new String[]{"-type", "2", "-message", "20000", "-concurrency", "20", "-size",
+//        args = new String[]{"-type", "1", "-message", "20", "-concurrency", "20", "-size",
 //                "10=4k,20=10k,30=60k,40=700K", "-topics", "syringa_one",
 //                "-bootstrap.servers",
 //                "172.22.33.99:9092,172.22.33.97:9092",
 //                "-configPath",
-//                "/Users/bilibili/soft/kafka-2.1.1/config/producer.properties",
+//                "/Users/dingsainan/soft/kafka_2.11-2.1.1/config/producer.properties",
 //                "-blacklistZkPath",
 //                "172.22.33.94:2181,172.22.33.99:2181,172.22.33.97:2181/nvm-t-kafka",
 //                "-minBatchSize",
