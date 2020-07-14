@@ -3,20 +3,9 @@
  */
 package com.bilibili.syringa.core.job;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Future;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.bilibili.syringa.core.job.task.ConsumerTask;
-import com.bilibili.syringa.core.statistics.RunResult;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 
 /**
  * @author xuezhaoming
@@ -24,43 +13,20 @@ import com.google.common.util.concurrent.ListenableFuture;
  */
 public class ConsumerJob extends AbstractJob {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerJob.class);
-
-    private List<Future<RunResult>> futures;
-
     private long messageCounter;
-    private List<String> topicList;
     private String name;
+    private int consumerNumber;
 
-    public ConsumerJob(String name, long messageCounter) {
+    public ConsumerJob(String name, long messageCounter, int consumerNumber) {
         this.name = name;
         this.messageCounter = messageCounter;
-        this.topicList = syringaContext.getSyringaSystemConfig().getTopicList();
-
+        this.consumerNumber = consumerNumber;
     }
 
     @Override
     public void call() {
-
-        List<RunResult> runResults = new ArrayList<>();
-
-        Collection<ConsumerTask> consumerTasks = new ArrayList<>(topicList.size());
-
         String groupId = name + "group";
-
-        ConsumerTask consumerTask = new ConsumerTask(syringaContext, groupId,
-                messageCounter);
-
-        ListenableFuture<RunResult> submitTask = listeningExecutorService.submit(consumerTask);
-        Futures.addCallback(submitTask, new FutureCallback<RunResult>() {
-            @Override
-            public void onSuccess(@Nullable RunResult result) {
-
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-
-            }
-        }, listeningExecutorService);
+        ConsumerTask consumerTask = new ConsumerTask(groupId, messageCounter, consumerNumber);
+        threadPoolExecutor.submit(consumerTask);
     }
 }

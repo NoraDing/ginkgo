@@ -98,7 +98,6 @@ public class OptionInit extends AbstractIdleService {
             //6.kafka地址
             syringaSystemConfig.setServers(servers);
 
-
             //7.黑名单的zk路径
             syringaSystemConfig.setBlacklistZkPath(blacklistZkPath);
 
@@ -246,10 +245,6 @@ public class OptionInit extends AbstractIdleService {
     private void messagesCheck(String messages) {
 
         Long messagesLong = Long.valueOf(messages);
-        if (messagesLong <= 0) {
-            LOGGER.error("invalid messages {}  muster bigger than zero !", messages);
-            System.exit(-1);
-        }
         syringaSystemConfig.setMessages(messagesLong);
     }
 

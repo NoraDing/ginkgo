@@ -55,15 +55,20 @@ public class JobManager extends AbstractIdleService {
     @Override
     protected void startUp() {
 
-        //转配成作业的配置 
-        long threadMessage = new BigDecimal(messages).divide(new BigDecimal(concurrency), 5)
-                .longValue();
+        //转配成作业的配置
+        long threadMessage;
+        if (messages == -1) {
+            threadMessage = -1;
+        } else {
+            threadMessage = new BigDecimal(messages).divide(new BigDecimal(concurrency), 5)
+                    .longValue();
+        }
 
         for (int j = 0; j < concurrency; j++) {
             Job job = null;
             switch (type) {
                 case CONSUMER:
-                    job = new ConsumerJob("consumer-job-" + j, threadMessage);
+                    job = new ConsumerJob("new-consumer-job-", threadMessage,j);
                     break;
                 case PRODUCER:
                     job = new ProduceJob(threadMessage);

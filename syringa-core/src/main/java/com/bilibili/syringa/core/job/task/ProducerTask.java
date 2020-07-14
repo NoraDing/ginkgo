@@ -49,9 +49,12 @@ public class ProducerTask implements Callable<RunResult> {
         runResult.setTypeEnums(TypeEnums.PRODUCER);
         runResult.setMessage(messageCounter);
         runResult.setStartDate(LocalDateTime.now());
-        for (int i = 0; i < messageCounter; i++) {
+        int counter = 1;
+        while (messageCounter == -1 ? true : false || counter < messageCounter) {
             sendMessage(runResult);
+            counter++;
         }
+
 
         List<RunResult> current = SyringaContext.getInstance().getRunResults();
         current.add(runResult);
@@ -67,7 +70,7 @@ public class ProducerTask implements Callable<RunResult> {
         }
         kafkaProducer.send(new ProducerRecord<String, String>(topic, message), (metadata, exception) -> {
                     if (exception != null) {
-                        LOGGER.error("has exception");
+                        LOGGER.error("has exception", exception);
                     } else {
                         int size = message.length();
                         runResult.setTotalSize(runResult.getTotalSize() + size);

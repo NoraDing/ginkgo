@@ -26,7 +26,17 @@ public class ProducerBuilder {
                 "org.apache.kafka.common.serialization.StringSerializer");
         properties.put(ConfigEnums.VALUE_SERIALIZER_CLASS_CONFIG.getField(),
                 "org.apache.kafka.common.serialization.StringSerializer");
+        properties.put("linger.ms", 10);
         properties.put("partitioner.class", "com.bilibili.syringa.core.producer.blacklist.BlackListPartitioner");
+        properties.put("sasl.kerberos.service.name", "kafka");
+        properties.put("sasl.mechanism", "GSSAPI");
+        properties.put("security.protocol", "SASL_PLAINTEXT");
+        properties.put("sasl.jaas.config", "com.sun.security.auth.module.Krb5LoginModule required " +
+                "useKeyTab=true " +
+                "storeKey=true " +
+                "keyTab=\"/root/client2.keytab\" " +
+                "principal=\"client2@BILIBILI.CO\";");
+
         return new KafkaProducer<String, String>(properties);
     }
 }
