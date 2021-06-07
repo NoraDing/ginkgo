@@ -1,0 +1,80 @@
+package com.bilibili.syringa.core.manager;
+
+import com.bapis.datacenter.shielder.shielder.UserDTO;
+import com.bilibili.syringa.core.configuration.ApplicationConfig;
+import com.bilibili.syringa.core.dto.KafkaTopicDTO;
+import com.bilibili.syringa.core.service.ExcelService;
+import com.bilibili.syringa.core.service.KafkaService;
+import com.bilibili.syringa.core.service.KeeperGrpcService;
+import com.bilibili.syringa.core.service.ShielderGrpcService;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Component
+public class LoadKafkaInfoToKeeperManager implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoadKafkaInfoToKeeperManager.class);
+
+    @Autowired
+    private KeeperGrpcService keeperGrpcService;
+    @Autowired
+    private ShielderGrpcService shielderGrpcService;
+    @Autowired
+    private ApplicationConfig applicationConfig;
+
+    /**
+     *
+     */
+    @PostConstruct
+    public void init() {
+        run();
+    }
+
+    @Override
+    public void run() {
+        LOGGER.info(" refresh the cache start at {} ", LocalDateTime.now());
+
+        refreshAllInfo();
+
+        LOGGER.info(" refresh the cache end at {} ", LocalDateTime.now());
+
+    }
+
+    private void refreshAllInfo() {
+        String bootstrapServer = applicationConfig.getBootstrapServer();
+        String cluster = applicationConfig.getCluster();//集群的名字
+        String filePath = applicationConfig.getFilePath();//excel文件的路径
+        LOGGER.info("the bootstrapServer:{},cluster:{},filePath:{}", bootstrapServer, cluster, filePath);
+
+        //从excel读数据
+        List<KafkaTopicDTO> kafkaTopicDTOS = ExcelService.readExcel(filePath);
+        LOGGER.info(kafkaTopicDTOS.toString());
+
+        if (CollectionUtils.isEmpty(kafkaTopicDTOS)) {
+            LOGGER.info("no info in excel ");
+            System.exit(1);
+        }
+
+        //excel读到的数据来获取partition(2.4.1.3版本)
+        KafkaService kafkaService = new KafkaService(bootstrapServer);
+        for (KafkaTopicDTO kafkaTopicDTO : kafkaTopicDTOS) {
+            if (!cluster.equals(kafkaTopicDTO.getCluster())) {
+                continue;
+            }
+            kafkaService.acquireKafkaTopicConfigInfo(kafkaTopicDTO);
+            UserDTO userDTO = shielderGrpcService.getUserId(kafkaTopicDTO);
+            LOGGER.info("the userDTO:{}", userDTO.getId());
+            kafkaTopicDTO.setUserId(userDTO.getId());
+            LOGGER.info("kafkaTopicDTO :{}", kafkaTopicDTO.toString());
+            keeperGrpcService.grpcAddTable(kafkaTopicDTO);
+            LOGGER.info("insert done ");
+            break;
+        }
+    }
+}

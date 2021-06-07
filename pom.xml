@@ -29,37 +29,12 @@
         <joda.version>2.9.4</joda.version>
         <javax-mail.version>1.5.2</javax-mail.version>
         <fastjson.version>1.2.54</fastjson.version>
+        <pleiades-version>1.0.28.1.RELEASE</pleiades-version>
+        <taishan-version>1.0.0-SNAPSHOT</taishan-version>
+        <grpc.version>1.33.1</grpc.version>
+        <keeper.version>1.0.0-SNAPSHOT</keeper.version>
+        <shielder.version>1.0.0-SNAPSHOT</shielder.version>
     </properties>
-
-    <!-- dependencies 配置的依赖 子项目会自动引入,不需要另配 -->
-<!--    <dependencies>-->
-<!--        <dependency>-->
-<!--            <groupId>ch.qos.logback</groupId>-->
-<!--            <artifactId>logback-core</artifactId>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>ch.qos.logback</groupId>-->
-<!--            <artifactId>logback-classic</artifactId>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>log4j</groupId>-->
-<!--                    <artifactId>log4j</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.slf4j</groupId>-->
-<!--                    <artifactId>slf4j-api</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
-<!--        &lt;!&ndash; testing &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>junit</groupId>-->
-<!--            <artifactId>junit</artifactId>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--    </dependencies>-->
 
 
     <!--  dependencies 配置的依赖 子项目引入时只需声明groupid,artifactid -->
@@ -180,6 +155,93 @@
                 <artifactId>gson</artifactId>
                 <version>2.7</version>
             </dependency>
+
+
+            <!--引入rpc-->
+            <dependency>
+                <groupId>pleiades.component.rpc</groupId>
+                <artifactId>rpc-client</artifactId>
+                <version>${pleiades-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pleiades.venus.naming</groupId>
+                <artifactId>naming-discovery</artifactId>
+                <version>${pleiades-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pleiades.venus.trace</groupId>
+                <artifactId>trace-client</artifactId>
+                <version>${pleiades-version}</version>
+            </dependency>
+            <!--spring boot项目需要引入，非spring boot不要引入-->
+            <dependency>
+                <groupId>pleiades.venus</groupId>
+                <artifactId>starter</artifactId>
+                <version>${pleiades-version}</version>
+            </dependency>
+            <!--引入泰山-->
+            <dependency>
+                <groupId>com.bapis.infra</groupId>
+                <artifactId>infra-service-taishan</artifactId>
+                <version>${taishan-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-stub</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bapis.datacenter</groupId>
+                <artifactId>datacenter-service-keeper</artifactId>
+                <version>${keeper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>4.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>4.0.1</version>
+            </dependency>
+
+            <!-- kafka -->
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_2.13</artifactId>
+                <version>2.4.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>2.4.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.bapis.datacenter</groupId>
+                <artifactId>datacenter-shielder-shielder</artifactId>
+                <version>${shielder.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -216,6 +278,10 @@
         <repository>
             <id>bilibili-nexus-snapshots</id>
             <url>http://nexus.bilibili.co/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>bilibili-nexus-bapis</id>
+            <url>http://nexus.bilibili.co/content/repositories/bapis/</url>
         </repository>
     </repositories>
     <build>

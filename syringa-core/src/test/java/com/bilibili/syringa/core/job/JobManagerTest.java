@@ -61,31 +61,7 @@ public class JobManagerTest {
 
     public static void main(String[] args) {
 
-        File file = new File("/tmp/topicInfo.txt");
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file));
-             FileOutputStream outSTr = new FileOutputStream(new File("/tmp/topics"));
-             BufferedOutputStream buff = new BufferedOutputStream(outSTr)) {
-            reader.lines().forEach(line -> {
-                String[] split = line.split("=");
-                if (split.length != 2) {
-                    //                    LOGGER.info("the input has issue");
-                } else {
-
-                    try {
-                        buff.write((split[1] + "\n").getBytes());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    LOGGER.info(split[1]);
-                }
-
-            });
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        long retentionDay = Long.parseLong("86400000") / 60 / 60 / 24/1000;
+        System.out.println("retentionDay" + retentionDay);
     }
 }
