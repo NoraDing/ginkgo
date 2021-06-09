@@ -1,28 +1,23 @@
 package com.bilibili.syringa.core.service;
 
 import com.bilibili.syringa.core.dto.KafkaTopicDTO;
-import kafka.zk.AdminZkClient;
-import kafka.zk.KafkaZkClient;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.config.ConfigResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
-
 
 public class KafkaService {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaService.class);
     private static String RETENTION_MS = "retention.ms";
-    private KafkaAdminClient kafkaAdminClient;
-    private KafkaZkClient kafkaZkClient;
-    private AdminZkClient adminZkClient;
+    private static String INTERNAL_TOPIC_PREFIX = "__";
+    private static long ONE_DAY_MS = 1000 * 60 * 60 * 24;
+    private static long DEFAULT_DAY = 3;
 
+    private KafkaAdminClient kafkaAdminClient;
 
     public KafkaService(String bootstrap) {
         if (kafkaAdminClient == null) {
@@ -30,8 +25,6 @@ public class KafkaService {
         }
     }
 
-    private static long ONE_DAY_MS = 1000 * 60 * 60 * 24;
-    private static long DEFAULT_DAY = 3;
 
     public void acquireKafkaTopicConfigInfo(KafkaTopicDTO kafkaTopicDTO) {
         String topic = kafkaTopicDTO.getTopic();
@@ -69,6 +62,43 @@ public class KafkaService {
         }
     }
 
+    /**
+     * Lancer-Log-HighLevel
+     * Lancer-Log-HighLevel-test
+     * Lancer-Log-RealTime-HighLevel。（highc有流量）
+     * Lancer-Log-RealTime-HighLevel-test
+     * Lancer-Log-RealTime-new
+     * LancerCache-Log-UnRealTime
+     *
+     * @param cluster
+     * @param existsTopics
+     * @return
+     */
+    public List<KafkaTopicDTO> loadAllTopics(String cluster, List<String> existsTopics) {
+        List<KafkaTopicDTO> kafkaTopicDTOS = new ArrayList<>();
+        ListTopicsResult listTopicsResult = kafkaAdminClient.listTopics();
+        try {
+            Set<String> topics = listTopicsResult.names().get();
+            topics.stream().forEach(topic -> {
+                if (!topic.startsWith(INTERNAL_TOPIC_PREFIX) && !existsTopics.contains(topic)
+                        && !"Lancer-Log-RealTime-HighLevel".equals(topic) && !"Lancer2-Cache-Realtime".equals(topic)
+                        && !"Lancer2-Cache-Unrealtime-HighLevel-compress".equals(topic)
+                        && !"Lancer-Log-RealTime-new-test".equals(topic)
+                        && !"r_bdp_lancer.pipeline_open_A_ELASTIC_SEARCH_failover".equals(topic)) {
+                    KafkaTopicDTO kafkaTopicDTO = new KafkaTopicDTO();
+                    kafkaTopicDTO.setCluster(cluster);
+                    kafkaTopicDTO.setTopic(topic);
+                    kafkaTopicDTO.setUsername("wangxiangyu");
+                    kafkaTopicDTO.setDepartmentName("数据平台部");
+                    kafkaTopicDTO.setType("lancer_sink_kafka");
+                    kafkaTopicDTOS.add(kafkaTopicDTO);
+                }
+            });
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error("load kafka info error", e);
+        }
+        return kafkaTopicDTOS;
+    }
 
     private KafkaAdminClient getKafkaAdminClient(String bootstrap) {
 

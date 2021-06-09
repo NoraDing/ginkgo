@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -60,8 +61,15 @@ public class JobManagerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobManagerTest.class);
 
     public static void main(String[] args) {
+        AtomicInteger counter = new AtomicInteger(0);
 
-        long retentionDay = Long.parseLong("86400000") / 60 / 60 / 24/1000;
-        System.out.println("retentionDay" + retentionDay);
+        while (true) {
+            System.out.println("counter: " + counter.get());
+            if (counter.addAndGet(1) > 10) {
+                System.out.println("finished");
+                break;
+            }
+        }
+
     }
 }

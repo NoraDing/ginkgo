@@ -20,6 +20,7 @@ import java.util.List;
 @Component
 public class LoadKafkaInfoToKeeperManager implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadKafkaInfoToKeeperManager.class);
+    private static String INTERNAL = "internal";
 
     @Autowired
     private KeeperGrpcService keeperGrpcService;
@@ -39,30 +40,37 @@ public class LoadKafkaInfoToKeeperManager implements Runnable {
     @Override
     public void run() {
         LOGGER.info(" refresh the cache start at {} ", LocalDateTime.now());
-
         refreshAllInfo();
-
         LOGGER.info(" refresh the cache end at {} ", LocalDateTime.now());
-
     }
+
 
     private void refreshAllInfo() {
         String bootstrapServer = applicationConfig.getBootstrapServer();
         String cluster = applicationConfig.getCluster();//集群的名字
         String filePath = applicationConfig.getFilePath();//excel文件的路径
-        LOGGER.info("the bootstrapServer:{},cluster:{},filePath:{}", bootstrapServer, cluster, filePath);
-
-        //从excel读数据
-        List<KafkaTopicDTO> kafkaTopicDTOS = ExcelService.readExcel(filePath);
-        LOGGER.info(kafkaTopicDTOS.toString());
-
-        if (CollectionUtils.isEmpty(kafkaTopicDTOS)) {
-            LOGGER.info("no info in excel ");
-            System.exit(1);
-        }
+        String zookeeperAddr = applicationConfig.getZookeeperAddr();
+        String clusterAttr = applicationConfig.getClusterAttr();
+        LOGGER.info("the bootstrapServer:{},cluster:{},filePath:{},zookeeperAddress:{},clusterAttr:{}"
+                , bootstrapServer, cluster, filePath, zookeeperAddr, clusterAttr);
 
         //excel读到的数据来获取partition(2.4.1.3版本)
         KafkaService kafkaService = new KafkaService(bootstrapServer);
+        List<KafkaTopicDTO> kafkaTopicDTOS;
+        if (INTERNAL.equals(clusterAttr)) {
+            //内部通过api来读取
+            List<String> existsTopics = ExcelService.readTopicExcel(filePath);
+            LOGGER.info("all topics in keeper");
+            kafkaTopicDTOS = kafkaService.loadAllTopics(cluster, existsTopics);
+        } else {
+            //外部从excel读数据
+            kafkaTopicDTOS = ExcelService.readExcel(filePath);
+        }
+        if (CollectionUtils.isEmpty(kafkaTopicDTOS)) {
+            LOGGER.info("no info in excel ");
+            return;
+        }
+        LOGGER.info("loaded topic info :{}", kafkaTopicDTOS.toString());
         for (KafkaTopicDTO kafkaTopicDTO : kafkaTopicDTOS) {
             if (!cluster.equals(kafkaTopicDTO.getCluster())) {
                 continue;
@@ -73,8 +81,7 @@ public class LoadKafkaInfoToKeeperManager implements Runnable {
             kafkaTopicDTO.setUserId(userDTO.getId());
             LOGGER.info("kafkaTopicDTO :{}", kafkaTopicDTO.toString());
             keeperGrpcService.grpcAddTable(kafkaTopicDTO);
-            LOGGER.info("insert done ");
-            break;
         }
+        LOGGER.info("insert done ");
     }
 }

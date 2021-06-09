@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pleiades.venus.starter.rpc.client.RPCClient;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class KeeperGrpcService {
@@ -16,7 +17,6 @@ public class KeeperGrpcService {
 
 
     public static final String KEEPER_DISCOVERY_ID = "datacenter.keeper.keeper";
-    private static String DEFAULT_DB_ID = "e53136f53ecd45649b8d679dde6cf2e1";
 
     @RPCClient(KEEPER_DISCOVERY_ID)
     private KeeperMultiTableGrpc.KeeperMultiTableBlockingStub stub;
@@ -29,27 +29,29 @@ public class KeeperGrpcService {
 
         LOGGER.info("start grpc to keeper");
 
-        DatasourceConfig datasourceConfig = DatasourceConfig.newBuilder().setDsName(kafkaInfo.getCluster()).build();
         BasicModule basicModule = BasicModule.newBuilder()
-                .setDsId("1714")
-                .setDsName(kafkaInfo.getCluster())
-                .setDbId(DEFAULT_DB_ID)
+                .setDsName("Kafka_"+kafkaInfo.getCluster())
                 .setDbName("default")
-                .setTabId("")
                 .setTabName(kafkaInfo.getTopic())
                 .setUserId(kafkaInfo.getUserId())
                 .setDataDuration(kafkaInfo.getRetentionDay())
                 .build();
-        BusinessModule businessModule = BusinessModule.newBuilder().setDepartmentId(1111).setDepartmentName(kafkaInfo.getDepartmentName()).build();
-        ConfigurationModule configurationModule = ConfigurationModule.newBuilder().setColSeparator("\\/u0001").setPartitionNumber(kafkaInfo.getPartition()).build();
-        ContentModule contentModule = ContentModule.newBuilder().setDataLevel("B").build();
+        BusinessModule businessModule = BusinessModule.newBuilder()
+                .setDepartmentName(kafkaInfo.getDepartmentName()).build();
+        ConfigurationModule configurationModule = ConfigurationModule.newBuilder().setColSeparator("\u0001").setPartitionNumber(kafkaInfo.getPartition()).build();
+        ContentModule contentModule = ContentModule.newBuilder()
+                .build();
         ModelModule modelModule = ModelModule.newBuilder().setModelLevel(1).build();
+        List<Column> columns = new ArrayList<>();
+        Column column = Column.newBuilder().setColIndex(0).setColName("json").setColType("STRING")
+                .setPrivilegeLevel("").setIsPartition(false).build();
+        columns.add(column);
         BaseTable baseTable = BaseTable.newBuilder().setDsType(DbType.Kafka).setBasicModule(basicModule).setBusinessModule(businessModule)
                 .setContentModule(contentModule)
                 .setInitDataWithoutBuildTable(WITHOUT_CREATE_TABLE)
                 .setModelModule(modelModule)
                 .setConfigurationModule(configurationModule)
-                .addAllCols(Collections.EMPTY_LIST).build();
+                .addAllCols(columns).build();
         stub.createTable(baseTable);
         LOGGER.info("add table done:{}", kafkaInfo.getTopic());
     }

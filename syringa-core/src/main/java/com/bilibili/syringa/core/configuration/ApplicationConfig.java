@@ -15,6 +15,12 @@ public class ApplicationConfig {
     @Value("${file.path}")
     private String filePath;
 
+    @Value("${zookeeper.address}")
+    private String zookeeperAddr;
+
+    @Value("${cluster.attr}")
+    private String clusterAttr;
+
     public String getBootstrapServer() {
         return bootstrapServer;
     }
@@ -25,5 +31,13 @@ public class ApplicationConfig {
 
     public String getFilePath() {
         return filePath;
+    }
+
+    public String getZookeeperAddr() {
+        return zookeeperAddr;
+    }
+
+    public String getClusterAttr() {
+        return clusterAttr;
     }
 }

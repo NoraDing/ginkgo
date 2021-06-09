@@ -74,35 +74,35 @@ public class ConsumerTask implements Callable<RunResult> {
 
     public long pollMessage(RunResult runResult) {
 
-        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(10000));
-        long count = records.count();
-        LOGGER.info("poll record size:{}", count);
-        return count;
+//        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(10000));
+//        long count = records.count();
+//        LOGGER.info("poll record size:{}", count);
+        return 1;
     }
 
-    public long pollMessageBak(RunResult runResult) {
-
-        if (runResult.getStartDate() == null) {
-            runResult.setStartDate(LocalDateTime.now());
-        }
-        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(10));
-        long count = records.count();
-        runResult.setMessage(runResult.getMessage() + count);
-
-        if (count != 0) {
-            LOGGER.info("we has value ");
-        }
-        for (ConsumerRecord<String, String> record : records) {
-            if (record.key() != null) {
-                int keySize = record.key().getBytes().length;
-                runResult.setTotalSize(runResult.getTotalSize() + keySize);
-            }
-            if (record.value() != null) {
-                int valueSize = record.value().getBytes().length;
-                runResult.setTotalSize(runResult.getTotalSize() + valueSize);
-            }
-        }
-        runResult.setFinishDate(LocalDateTime.now());
-        return count;
-    }
+//    public long pollMessageBak(RunResult runResult) {
+//
+//        if (runResult.getStartDate() == null) {
+//            runResult.setStartDate(LocalDateTime.now());
+//        }
+//        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(10));
+//        long count = records.count();
+//        runResult.setMessage(runResult.getMessage() + count);
+//
+//        if (count != 0) {
+//            LOGGER.info("we has value ");
+//        }
+//        for (ConsumerRecord<String, String> record : records) {
+//            if (record.key() != null) {
+//                int keySize = record.key().getBytes().length;
+//                runResult.setTotalSize(runResult.getTotalSize() + keySize);
+//            }
+//            if (record.value() != null) {
+//                int valueSize = record.value().getBytes().length;
+//                runResult.setTotalSize(runResult.getTotalSize() + valueSize);
+//            }
+//        }
+//        runResult.setFinishDate(LocalDateTime.now());
+//        return count;
+//    }
 }
