@@ -25,7 +25,7 @@ public class ConsumerJob extends AbstractJob {
 
     @Override
     public void call() {
-        String groupId = name + "group";
+        String groupId = name + consumerNumber + "-syringe-group";
         ConsumerTask consumerTask = new ConsumerTask(groupId, messageCounter, consumerNumber);
         threadPoolExecutor.submit(consumerTask);
     }

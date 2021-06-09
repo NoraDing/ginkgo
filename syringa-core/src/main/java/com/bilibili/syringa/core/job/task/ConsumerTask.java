@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import com.bilibili.syringa.core.producer.ProducerBuilder;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -53,10 +54,12 @@ public class ConsumerTask implements Callable<RunResult> {
             runResult.setTypeEnums(TypeEnums.CONSUMER);
             runResult.setMessage(messageCounter);
             kafkaConsumer.subscribe(topics);
+            LOGGER.info("the topic is :{},length:{}", topics, topics.size());
             boolean loopAll = messageCounter == -1 ? true : false;
             while (loopAll || messageCounter > 0) {
                 long count = pollMessage(runResult);
                 messageCounter = messageCounter - count;
+                TimeUnit.SECONDS.sleep(10);
             }
             runResult.setSuccess(true);
             List<RunResult> current = SyringaContext.getInstance().getRunResults();
@@ -71,34 +74,35 @@ public class ConsumerTask implements Callable<RunResult> {
 
     public long pollMessage(RunResult runResult) {
 
-        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(10));
-        long count = records.count();
-        return count;
+//        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(10000));
+//        long count = records.count();
+//        LOGGER.info("poll record size:{}", count);
+        return 1;
     }
 
-    public long pollMessageBak(RunResult runResult) {
-
-        if (runResult.getStartDate() == null) {
-            runResult.setStartDate(LocalDateTime.now());
-        }
-        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(10));
-        long count = records.count();
-        runResult.setMessage(runResult.getMessage() + count);
-
-        if (count != 0) {
-            LOGGER.info("we has value ");
-        }
-        for (ConsumerRecord<String, String> record : records) {
-            if (record.key() != null) {
-                int keySize = record.key().getBytes().length;
-                runResult.setTotalSize(runResult.getTotalSize() + keySize);
-            }
-            if (record.value() != null) {
-                int valueSize = record.value().getBytes().length;
-                runResult.setTotalSize(runResult.getTotalSize() + valueSize);
-            }
-        }
-        runResult.setFinishDate(LocalDateTime.now());
-        return count;
-    }
+//    public long pollMessageBak(RunResult runResult) {
+//
+//        if (runResult.getStartDate() == null) {
+//            runResult.setStartDate(LocalDateTime.now());
+//        }
+//        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(10));
+//        long count = records.count();
+//        runResult.setMessage(runResult.getMessage() + count);
+//
+//        if (count != 0) {
+//            LOGGER.info("we has value ");
+//        }
+//        for (ConsumerRecord<String, String> record : records) {
+//            if (record.key() != null) {
+//                int keySize = record.key().getBytes().length;
+//                runResult.setTotalSize(runResult.getTotalSize() + keySize);
+//            }
+//            if (record.value() != null) {
+//                int valueSize = record.value().getBytes().length;
+//                runResult.setTotalSize(runResult.getTotalSize() + valueSize);
+//            }
+//        }
+//        runResult.setFinishDate(LocalDateTime.now());
+//        return count;
+//    }
 }

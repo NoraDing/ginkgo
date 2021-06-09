@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -60,31 +61,14 @@ public class JobManagerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobManagerTest.class);
 
     public static void main(String[] args) {
+        AtomicInteger counter = new AtomicInteger(0);
 
-        File file = new File("/tmp/topicInfo.txt");
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file));
-             FileOutputStream outSTr = new FileOutputStream(new File("/tmp/topics"));
-             BufferedOutputStream buff = new BufferedOutputStream(outSTr)) {
-            reader.lines().forEach(line -> {
-                String[] split = line.split("=");
-                if (split.length != 2) {
-                    //                    LOGGER.info("the input has issue");
-                } else {
-
-                    try {
-                        buff.write((split[1] + "\n").getBytes());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    LOGGER.info(split[1]);
-                }
-
-            });
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        while (true) {
+            System.out.println("counter: " + counter.get());
+            if (counter.addAndGet(1) > 10) {
+                System.out.println("finished");
+                break;
+            }
         }
 
     }

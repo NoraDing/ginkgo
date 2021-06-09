@@ -22,14 +22,18 @@ public class ConsumerBuilder {
                 "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put(ConfigEnums.VALUE_DESERIALIZER_CLASS_CONFIG.getField(),
                 "org.apache.kafka.common.serialization.StringDeserializer");
-        properties.put("sasl.kerberos.service.name", "kafka");
-        properties.put("sasl.mechanism", "GSSAPI");
-        properties.put("security.protocol", "SASL_PLAINTEXT");
-        properties.put("sasl.jaas.config", "com.sun.security.auth.module.Krb5LoginModule required " +
-                "useKeyTab=true " +
-                "storeKey=true " +
-                "keyTab=\"/root/client2.keytab\" " +
-                "principal=\"client2@BILIBILI.CO\";");
+        properties.put("enable.auto.commit", true);
+        properties.put("auto.commit.interval.ms", 1000);
+        properties.put("auto.offset.reset", "latest");
+//
+//        properties.put("sasl.kerberos.service.name", "kafka");
+//        properties.put("sasl.mechanism", "GSSAPI");
+//        properties.put("security.protocol", "SASL_PLAINTEXT");
+//        properties.put("sasl.jaas.config", "com.sun.security.auth.module.Krb5LoginModule required " +
+//                "useKeyTab=true " +
+//                "storeKey=true " +
+//                "keyTab=\"/root/client2.keytab\" " +
+//                "principal=\"client2@BILIBILI.CO\";");
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(properties);
         return kafkaConsumer;
     }

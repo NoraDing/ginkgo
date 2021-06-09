@@ -6,9 +6,11 @@ package com.bilibili.syringa.core.job.task;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import com.bilibili.syringa.core.job.MessageGenerator;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -26,11 +28,13 @@ import com.bilibili.syringa.core.statistics.RunResult;
 public class ProducerTask implements Callable<RunResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProducerTask.class);
+    private long batchSize;
     private KafkaProducer kafkaProducer;
     private long messageCounter;
     private MessageGenerator messageGenerator;
     private String topic;
     private RunResult runResult;
+    private long counter;
 
 
     public ProducerTask(String topic, long messageCounter) {
@@ -41,25 +45,34 @@ public class ProducerTask implements Callable<RunResult> {
                 SyringaContext
                         .getInstance().getSyringaSystemConfig().getProperties());
         this.runResult = new RunResult();
+        batchSize = SyringaContext.getInstance().getSyringaSystemConfig().getMaxBatchSize();
+
     }
 
     @Override
     public RunResult call() {
+
         runResult.setTopicName(topic);
         runResult.setTypeEnums(TypeEnums.PRODUCER);
         runResult.setMessage(messageCounter);
         runResult.setStartDate(LocalDateTime.now());
-        int counter = 0;
+        counter = 0;
+        int sendSize = 0;
+
         try {
             while (messageCounter == -1 ? true : false || counter < messageCounter) {
-                sendMessage(runResult);
-                counter++;
+                while (sendSize < batchSize) {
+                    sendSize++;
+                    counter++;
+                    sendMessage(runResult);
+                }
+                kafkaProducer.flush();
+                sendSize = 0;
             }
             List<RunResult> current = SyringaContext.getInstance().getRunResults();
             current.add(runResult);
-
         } catch (Exception e) {
-            LOGGER.error("has exception ", e);
+            LOGGER.error("has exception", e);
         } finally {
             kafkaProducer.close();
         }
@@ -80,10 +93,10 @@ public class ProducerTask implements Callable<RunResult> {
                         int size = message.length();
                         runResult.setTotalSize(runResult.getTotalSize() + size);
                         runResult.setFinishDate(LocalDateTime.now());
-
                     }
-
                 }
         );
+
+        if (CollectionUtils.isNotEmpty(null)){}
     }
 }
