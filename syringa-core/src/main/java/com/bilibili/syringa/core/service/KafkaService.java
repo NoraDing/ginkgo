@@ -69,6 +69,9 @@ public class KafkaService {
      * Lancer-Log-RealTime-HighLevel-test
      * Lancer-Log-RealTime-new
      * LancerCache-Log-UnRealTime
+     * <p>
+     * rtd_flow_app/ datacenter_polaris  玄天
+     * datacenter_fawkes***liko
      *
      * @param cluster
      * @param existsTopics
@@ -80,17 +83,13 @@ public class KafkaService {
         try {
             Set<String> topics = listTopicsResult.names().get();
             topics.stream().forEach(topic -> {
-                if (!topic.startsWith(INTERNAL_TOPIC_PREFIX) && !existsTopics.contains(topic)
-                        && !"Lancer-Log-RealTime-HighLevel".equals(topic) && !"Lancer2-Cache-Realtime".equals(topic)
-                        && !"Lancer2-Cache-Unrealtime-HighLevel-compress".equals(topic)
-                        && !"Lancer-Log-RealTime-new-test".equals(topic)
-                        && !"r_bdp_lancer.pipeline_open_A_ELASTIC_SEARCH_failover".equals(topic)) {
+                if (!topic.startsWith(INTERNAL_TOPIC_PREFIX) && topic.startsWith("datacenter_polaris") && !existsTopics.contains(topic)) {
                     KafkaTopicDTO kafkaTopicDTO = new KafkaTopicDTO();
                     kafkaTopicDTO.setCluster(cluster);
                     kafkaTopicDTO.setTopic(topic);
-                    kafkaTopicDTO.setUsername("wangxiangyu");
+                    kafkaTopicDTO.setUsername("dongziping");
                     kafkaTopicDTO.setDepartmentName("数据平台部");
-                    kafkaTopicDTO.setType("lancer_sink_kafka");
+                    kafkaTopicDTO.setType("saber_write_kafka");
                     kafkaTopicDTOS.add(kafkaTopicDTO);
                 }
             });
